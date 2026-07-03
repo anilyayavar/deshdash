@@ -546,7 +546,7 @@
   <div class="sidebar-logo">
     <span class="tool-name">DeshDash</span>
     <span class="sub">User Manual</span>
-    <span class="version-badge">ver. 1.0</span>
+    <span class="version-badge">ver. 1.1</span>
   </div>
 
   <div class="nav-section-label">Getting Started</div>
@@ -559,6 +559,7 @@
   <a href="#titles" class="nav-link"><span class="nav-icon">🏷️</span> Titles &amp; Placement</a>
   <a href="#entry"   class="nav-link"><span class="nav-icon">📝</span> Entering State Data</a>
   <a href="#csv"     class="nav-link"><span class="nav-icon">📋</span> Paste / Upload CSV</a>
+  <a href="#multi-col" class="nav-link"><span class="nav-icon">🧮</span> Upload — Column Mapping</a>
   <a href="#format"  class="nav-link"><span class="nav-icon">🔢</span> Value Formatting</a>
 
   <div class="nav-section-label">Style Tab</div>
@@ -590,7 +591,7 @@
   <!-- Hero -->
   <div class="hero">
     <p class="hero-eyebrow">User Manual &nbsp;·&nbsp; Complete Guide</p>
-    <h1>DeshDash<br><span>ver. 1.0</span></h1>
+    <h1>DeshDash<br><span>ver. 1.1</span></h1>
     <p class="hero-desc">Build state-wise choropleth maps of India — labels, legends, and export in one tool. Free and hosted online at <a href="https://anilyayavar.github.io/deshdash/" target="_blank" rel="noopener" style="color:#fff;text-decoration:underline">anilyayavar.github.io/deshdash</a> — just open the link, no installation or sign-up needed.</p>
     <div class="hero-badges">
       <span class="hero-badge featured">🗺️ Choropleth Maps</span>
@@ -816,7 +817,7 @@
         <div class="feature-card">
           <span class="fc-icon">📁</span>
           <div class="fc-title">Upload CSV</div>
-          <p>Choose a .csv file from your computer — it parses and loads automatically on selection, no extra click needed.</p>
+          <p>Choose any <code>.csv</code> or <code>.txt</code> file — works for a simple two-column file or a wide sheet with several columns. See <a href="#multi-col">Upload CSV — Column Mapping</a> below for the full workflow.</p>
         </div>
       </div>
 
@@ -825,6 +826,46 @@
       <div class="callout warn">
         <span class="callout-icon">⚠️</span>
         <p>If a state doesn't match, double-check for extra spaces, unusual punctuation, or a name DeshDash doesn't recognize yet. Standard 2-letter state codes and most common name variants are supported.</p>
+      </div>
+    </div>
+
+
+    <!-- ════ MULTI-COLUMN ════ -->
+    <div class="section" id="multi-col">
+      <div class="section-header">
+        <div class="section-icon icon-green">🧮</div>
+        <h2>Upload CSV — Column Mapping</h2>
+      </div>
+
+      <p>Click <strong>Upload CSV</strong> above the data grid to load a file. This works for any layout — a simple two-column file (state, value), or a wider sheet with extra columns, e.g. state name, population, growth rate, and literacy rate all in the same file.</p>
+
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <div class="step-title">Upload the file</div>
+            <p>Choose any <code>.csv</code> file with two or more columns. DeshDash reads the header row and every column's data.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <div class="step-title">Check the auto-detected columns</div>
+            <p>Two dropdowns appear — <strong>State / UT column</strong> and <strong>Value column</strong> — populated from your file's actual headers. DeshDash guesses both automatically (by matching column values against known state names, and picking the first mostly-numeric column), but you can change either dropdown if the guess is wrong.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <div class="step-title">Click Load Selected Columns</div>
+            <p>The standard data table fills in from your chosen pair of columns, exactly as if you'd typed or pasted it directly.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout tip">
+        <span class="callout-icon">✅</span>
+        <p><strong>Multiple maps from one file:</strong> if your file has several numeric columns (e.g. population <em>and</em> literacy rate), just switch the <strong>Value column</strong> dropdown to a different one at any time — the table reloads and the map redraws with the new metric immediately. No need to re-upload the file to compare different measures from the same dataset.</p>
       </div>
     </div>
 
@@ -1114,7 +1155,19 @@
       </div>
 
       <div class="version-row">
-        <span class="version-tag current">1.0</span>
+        <span class="version-tag current">1.1</span>
+        <ul class="version-items">
+          <li><b>Upload CSV</b> now handles any column layout — pick which column is the state name and which is the value from dropdowns populated straight from your file's headers (replaces the old fixed two-column upload)</li>
+          <li>Switch between multiple value columns in the same file to redraw the map with a different metric, without re-uploading</li>
+          <li>Diverging scale midpoint moved to a slider below Min/Max, visible only in manual-range mode, bounded by your current range</li>
+          <li>Midpoint slider step size now matches your data's decimal precision (whole numbers step by 1, 2-decimal data steps by 0.01, etc.)</li>
+          <li>Fixed: legend now correctly bends around a custom midpoint instead of always assuming it's centered</li>
+          <li>Fixed: Min/Max fields now prefill with the data's actual auto-computed range when switching off Auto min/max, instead of resetting to 0/100</li>
+        </ul>
+      </div>
+
+      <div class="version-row">
+        <span class="version-tag">1.0</span>
         <ul class="version-items">
           <li>Initial public release — Data, Style, Labels, and Export tabs complete</li>
           <li>Sequential and Diverging color scales with custom gradients</li>
@@ -1129,7 +1182,7 @@
 
     <!-- Footer -->
     <div style="border-top: 1px solid var(--border); padding-top: 1.5rem; margin-top: 2rem; font-size: 12.5px; color: var(--muted);">
-      DeshDash ver. 1.0 &nbsp;·&nbsp; Hosted at anilyayavar.github.io/deshdash &nbsp;·&nbsp; No data leaves your browser &nbsp;·&nbsp;
+      DeshDash ver. 1.1 &nbsp;·&nbsp; Hosted at anilyayavar.github.io/deshdash &nbsp;·&nbsp; No data leaves your browser &nbsp;·&nbsp;
       Developed by <strong>Anil Kumar Goyal</strong> ·
       <a href="https://www.linkedin.com/in/anil-kumar-goyal/" target="_blank" rel="noopener" style="color:var(--accent)">LinkedIn</a>
     </div>

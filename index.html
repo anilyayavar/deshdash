@@ -144,7 +144,7 @@ input[type=checkbox] { accent-color: #6c8dfa; width: 14px; height: 14px; cursor:
       <div class="btn-group" style="margin-bottom:8px">
         <button class="btn btn-sm btn-secondary" id="btn-tbl">Table</button>
         <button class="btn btn-sm btn-secondary" id="btn-csv">Paste CSV</button>
-        <div class="fi-wrap"><button class="btn btn-sm btn-secondary">Upload CSV</button><input type="file" id="f-csv" accept=".csv,.txt"></div>
+        <button class="btn btn-sm btn-secondary" id="btn-multi">Upload CSV</button>
       </div>
 
       <div id="tbl-panel">
@@ -175,8 +175,25 @@ input[type=checkbox] { accent-color: #6c8dfa; width: 14px; height: 14px; cursor:
           <b>Accepted formats:</b> comma-separated <code>State,Value</code> or tab-separated (paste directly from Excel).<br>
           <b>State names:</b> full names (<i>Maharashtra</i>) or 2-letter codes (<i>MH, MP, WB…</i>).<br>
           <b>Header row:</b> auto-detected and skipped.<br>
-          <b>Numbers:</b> commas in numbers are fine — <i>1,00,000</i> or <i>12,500</i> both work.<br>
-          <b>Upload CSV:</b> data loads directly — no extra step needed.
+          <b>Numbers:</b> commas in numbers are fine — <i>1,00,000</i> or <i>12,500</i> both work.
+        </div>
+      </div>
+
+      <div id="multi-panel" style="display:none">
+        <label class="cl">Upload a CSV or text file</label>
+        <input type="file" id="f-multi" accept=".csv,.txt" style="width:100%">
+        <div id="multi-map-ui" style="display:none;margin-top:10px">
+          <label class="cl">State / UT column</label>
+          <select id="sel-state-col"></select>
+          <label class="cl">Value column</label>
+          <select id="sel-value-col"></select>
+          <div class="exp-desc" style="margin-top:4px">
+            If your file has more than one value column, switch <b>Value column</b> anytime to redraw the map with a different metric — no need to re-upload.
+          </div>
+          <button class="btn btn-primary btn-sm" id="btn-multi-load" style="margin-top:8px">Load Selected Columns</button>
+        </div>
+        <div class="exp-desc" style="margin-top:6px;line-height:1.7">
+          <b>Works with any CSV</b> — a simple two-column file (state, value) or a wide sheet with extra columns (population, growth rate, literacy rate, etc). Columns are auto-detected and pre-selected in the dropdowns above; confirm or change them, then click Load. If there are several numeric columns, switch between them anytime without re-uploading.
         </div>
       </div>
 
@@ -1255,10 +1272,17 @@ function init() {
   document.getElementById('btn-tbl').addEventListener('click',()=>{
     document.getElementById('tbl-panel').style.display='';
     document.getElementById('csv-panel').style.display='none';
+    document.getElementById('multi-panel').style.display='none';
   });
   document.getElementById('btn-csv').addEventListener('click',()=>{
     document.getElementById('tbl-panel').style.display='none';
     document.getElementById('csv-panel').style.display='block';
+    document.getElementById('multi-panel').style.display='none';
+  });
+  document.getElementById('btn-multi').addEventListener('click',()=>{
+    document.getElementById('tbl-panel').style.display='none';
+    document.getElementById('csv-panel').style.display='none';
+    document.getElementById('multi-panel').style.display='block';
   });
   function parseCSVText(txt) {
     if (!txt.trim()) return 0;
@@ -1289,16 +1313,94 @@ function init() {
     document.getElementById('csv-panel').style.display='none';
     setStatus(n ? `${n} rows loaded — click Generate Map` : 'No data found in CSV','ok');
   });
-  document.getElementById('f-csv').addEventListener('change',e=>{
+  // ── Upload CSV (any column layout): parse once, let the user pick/switch which
+  // columns are the state name and the value, without re-uploading. ──
+  let multiHeaders=[], multiRows=[];
+
+  function parseMultiCSV(txt) {
+    const lines=txt.split('\n').map(l=>l.replace(/\r$/,'')).filter(l=>l.trim()!==''&&!l.trim().startsWith('#'));
+    if (!lines.length) return null;
+    const delim=lines.some(l=>l.includes('\t')) ? '\t' : ',';
+    const headers=lines[0].split(delim).map(h=>h.trim().replace(/^"|"$/g,''));
+    const rows=lines.slice(1).map(line=>{
+      const parts=line.split(delim);
+      const obj={};
+      headers.forEach((h,i)=>{ obj[h]=(parts[i]||'').trim().replace(/^"|"$/g,''); });
+      return obj;
+    });
+    return {headers, rows};
+  }
+
+  function isNumericStr(s) {
+    if (s===undefined||s==='') return false;
+    return !isNaN(parseFloat(String(s).replace(/,(?=\d)/g,'')));
+  }
+
+  // Guesses the state-name column (most values match a known state) and the
+  // first plausible numeric column, so the dropdowns start pre-selected.
+  function guessColumns(headers, rows) {
+    let bestStateCol=headers[0], bestScore=-1;
+    headers.forEach(h=>{
+      const matches=rows.filter(r=>{
+        const cn=canon(r[h]);
+        return geoData.features.some(f=>canon(geoName(f))===cn) || ALIASES[String(r[h]).trim().toLowerCase()];
+      }).length;
+      if (matches>bestScore) { bestScore=matches; bestStateCol=h; }
+    });
+    const valueCandidates=headers.filter(h=>h!==bestStateCol &&
+      rows.filter(r=>isNumericStr(r[h])).length > rows.length*0.5);
+    return { stateCol: bestStateCol, valueCols: valueCandidates.length ? valueCandidates : headers.filter(h=>h!==bestStateCol) };
+  }
+
+  function loadMultiColumnData() {
+    const stateCol=document.getElementById('sel-state-col').value;
+    const valueCol=document.getElementById('sel-value-col').value;
+    document.getElementById('tbody').innerHTML='';
+    let count=0;
+    multiRows.forEach(r=>{
+      const state=(r[stateCol]||'').trim();
+      const rawVal=(r[valueCol]||'').trim();
+      const val=rawVal.replace(/,(?=\d)/g,'');
+      if (state) { addRow(state, val); count++; }
+    });
+    return count;
+  }
+
+  document.getElementById('f-multi').addEventListener('change',e=>{
     const file=e.target.files[0]; if(!file) return;
     const r=new FileReader();
     r.onload=ev=>{
-      const n=parseCSVText(ev.target.result);
-      document.getElementById('tbl-panel').style.display='';
-      document.getElementById('csv-panel').style.display='none';
-      setStatus(n ? `${n} rows loaded from file — click Generate Map` : 'No data found in file','ok');
+      const parsed=parseMultiCSV(ev.target.result);
+      if (!parsed || !parsed.headers.length) { setStatus('Could not read columns from file','warn'); return; }
+      multiHeaders=parsed.headers; multiRows=parsed.rows;
+      const guess=guessColumns(multiHeaders, multiRows);
+      const stateSel=document.getElementById('sel-state-col');
+      const valSel=document.getElementById('sel-value-col');
+      stateSel.innerHTML=multiHeaders.map(h=>`<option value="${h}">${h}</option>`).join('');
+      valSel.innerHTML=multiHeaders.map(h=>`<option value="${h}">${h}</option>`).join('');
+      stateSel.value=guess.stateCol;
+      valSel.value=guess.valueCols[0]||multiHeaders[0];
+      document.getElementById('multi-map-ui').style.display='';
+      setStatus(`${multiRows.length} rows, ${multiHeaders.length} columns found — check the column mapping below`,'ok');
     };
     r.readAsText(file); e.target.value='';
+  });
+
+  document.getElementById('btn-multi-load').addEventListener('click',()=>{
+    const n=loadMultiColumnData();
+    document.getElementById('tbl-panel').style.display='';
+    document.getElementById('multi-panel').style.display='none';
+    setStatus(n ? `${n} rows loaded — click Generate Map` : 'No matching rows found','ok');
+  });
+
+  // Switching the Value column re-populates the table with the new metric and
+  // redraws immediately — lets a user flip between multiple data columns in
+  // the same file without re-uploading or re-mapping the state column.
+  document.getElementById('sel-value-col').addEventListener('change',()=>{
+    if (!multiRows.length) return;
+    const n=loadMultiColumnData();
+    setStatus(n ? `Switched to "${document.getElementById('sel-value-col').value}" — ${n} rows loaded` : 'No matching rows found','ok');
+    if (mapGenerated) doGenerate();
   });
 
   // Titles

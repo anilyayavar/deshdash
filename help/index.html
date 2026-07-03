@@ -1,0 +1,1157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DeshDash — User Manual</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400&display=swap');
+
+  :root {
+    --navy:   #1A237E;
+    --accent: #4F6AF5;
+    --light-accent: #D6DCFF;
+    --success: #27AE60;
+    --warn: #E67E22;
+    --danger: #E84545;
+    --text: #1E2235;
+    --muted: #5A6178;
+    --border: #DDE2F0;
+    --bg: #F4F6FB;
+    --card: #FFFFFF;
+    --code-bg: #F0F3FF;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 15px;
+    line-height: 1.75;
+  }
+
+  /* ── Sidebar nav ── */
+  .sidebar {
+    position: fixed;
+    top: 0; left: 0;
+    width: 260px;
+    height: 100vh;
+    background: var(--navy);
+    overflow-y: auto;
+    z-index: 100;
+    padding-bottom: 2rem;
+  }
+
+  .sidebar-logo {
+    padding: 2rem 1.5rem 1rem;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    margin-bottom: 0.75rem;
+  }
+
+  .sidebar-logo .tool-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    color: #fff;
+    display: block;
+  }
+
+  .sidebar-logo .version-badge {
+    display: inline-block;
+    margin-top: 6px;
+    background: var(--accent);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.07em;
+    padding: 2px 10px;
+    border-radius: 20px;
+    font-family: 'DM Mono', monospace;
+  }
+
+  .sidebar-logo .sub {
+    display: block;
+    font-size: 11px;
+    color: rgba(255,255,255,0.45);
+    margin-top: 4px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .nav-section-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.35);
+    padding: 1.2rem 1.5rem 0.4rem;
+  }
+
+  .nav-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0.5rem 1.5rem;
+    font-size: 13.5px;
+    color: rgba(255,255,255,0.7);
+    text-decoration: none;
+    border-left: 3px solid transparent;
+    transition: all 0.15s;
+  }
+
+  .nav-link:hover {
+    color: #fff;
+    background: rgba(255,255,255,0.06);
+    border-left-color: var(--accent);
+  }
+
+  .nav-link.active {
+    color: #fff;
+    background: rgba(79,106,245,0.2);
+    border-left-color: #fff;
+  }
+
+  .nav-icon {
+    font-size: 15px;
+    opacity: 0.75;
+    flex-shrink: 0;
+  }
+
+  /* ── Main content ── */
+  .main {
+    margin-left: 260px;
+    min-height: 100vh;
+  }
+
+  /* ── Cover hero ── */
+  .hero {
+    background: linear-gradient(135deg, var(--navy) 0%, #2a3a8f 50%, #3d52c4 100%);
+    padding: 5rem 4rem 4rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -80px; right: -80px;
+    width: 400px; height: 400px;
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 50%;
+  }
+
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: -120px; right: 80px;
+    width: 280px; height: 280px;
+    border: 1px solid rgba(255,255,255,0.04);
+    border-radius: 50%;
+  }
+
+  .hero-eyebrow {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.5);
+    margin-bottom: 1rem;
+  }
+
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 48px;
+    color: #fff;
+    line-height: 1.1;
+    margin-bottom: 1rem;
+  }
+
+  .hero h1 span {
+    color: #C5CEFF;
+  }
+
+  .hero-desc {
+    font-size: 16px;
+    color: rgba(255,255,255,0.65);
+    max-width: 520px;
+    line-height: 1.8;
+    margin-bottom: 2.5rem;
+  }
+
+  .hero-badges {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .hero-badge {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.15);
+    color: rgba(255,255,255,0.85);
+    font-size: 12px;
+    padding: 5px 14px;
+    border-radius: 20px;
+    font-weight: 500;
+  }
+
+  .hero-badge.featured {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+
+  /* ── Content area ── */
+  .content {
+    padding: 3.5rem 4rem;
+    max-width: 860px;
+  }
+
+  /* ── Sections ── */
+  .section {
+    margin-bottom: 4rem;
+    scroll-margin-top: 2rem;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid var(--border);
+  }
+
+  .section-icon {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  .icon-blue   { background: #E6F1FF; color: var(--accent); }
+  .icon-green  { background: #E6F5EE; color: var(--success); }
+  .icon-orange { background: #FEF0E6; color: var(--warn); }
+  .icon-red    { background: #FEECEC; color: var(--danger); }
+  .icon-purple { background: var(--light-accent); color: var(--navy); }
+  .icon-gray   { background: #F0F0F0; color: #555; }
+
+  .section h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--navy);
+    letter-spacing: -0.01em;
+  }
+
+  h3 {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+    margin: 1.75rem 0 0.6rem;
+  }
+
+  p { margin-bottom: 0.85rem; color: var(--muted); }
+
+  /* ── Cards ── */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .card-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 0.4rem;
+  }
+
+  .card p { margin-bottom: 0; font-size: 13.5px; }
+
+  /* Feature cards grid */
+  .feature-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .feature-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.25rem;
+  }
+
+  .feature-card .fc-icon {
+    font-size: 22px;
+    margin-bottom: 0.75rem;
+    display: block;
+  }
+
+  .feature-card .fc-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 0.35rem;
+  }
+
+  .feature-card p {
+    font-size: 13px;
+    margin-bottom: 0;
+    line-height: 1.6;
+  }
+
+  /* ── Step-by-step ── */
+  .steps {
+    counter-reset: step;
+    margin: 1rem 0 1.5rem;
+  }
+
+  .step {
+    display: flex;
+    gap: 1.25rem;
+    margin-bottom: 1.25rem;
+    align-items: flex-start;
+  }
+
+  .step-num {
+    counter-increment: step;
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    background: var(--navy);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .step-body .step-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 0.2rem;
+  }
+
+  .step-body p {
+    font-size: 13.5px;
+    margin-bottom: 0;
+    line-height: 1.65;
+  }
+
+  /* ── Info / tip / warning boxes ── */
+  .callout {
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+    margin: 1.25rem 0;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .callout-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+
+  .callout p { margin-bottom: 0; font-size: 13.5px; }
+
+  .callout.tip    { background: #E6F5EE; border: 1px solid #B2DFCC; }
+  .callout.tip p  { color: #1a5c3a; }
+  .callout.tip .callout-icon { color: var(--success); }
+
+  .callout.warn    { background: #FEF6EC; border: 1px solid #F8D7A8; }
+  .callout.warn p  { color: #7a4c0c; }
+  .callout.warn .callout-icon { color: var(--warn); }
+
+  .callout.info    { background: #EEF2FF; border: 1px solid #C5CEFF; }
+  .callout.info p  { color: #2d3a9e; }
+  .callout.info .callout-icon { color: var(--accent); }
+
+  /* ── Code / keyboard ── */
+  kbd {
+    display: inline-block;
+    background: #F0F3FF;
+    border: 1px solid #C5CEFF;
+    border-bottom-width: 2px;
+    border-radius: 5px;
+    padding: 1px 7px;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--navy);
+  }
+
+  code {
+    font-family: 'DM Mono', monospace;
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1px 6px;
+    font-size: 12.5px;
+    color: var(--navy);
+  }
+
+  /* ── Named pill ── */
+  .filename-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 3px 12px 3px 8px;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--navy);
+    margin: 2px 3px;
+  }
+
+  .filename-pill .dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .dot-blue   { background: var(--accent); }
+  .dot-green  { background: var(--success); }
+  .dot-orange { background: var(--warn); }
+
+  /* ── Quick-ref table ── */
+  .ref-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13.5px;
+    margin: 1rem 0 1.5rem;
+    background: var(--card);
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+
+  .ref-table th {
+    text-align: left;
+    padding: 10px 16px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .ref-table td {
+    padding: 10px 16px;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+
+  .ref-table tr:last-child td { border-bottom: none; }
+
+  .ref-table td:first-child {
+    font-weight: 600;
+    color: var(--text);
+    white-space: nowrap;
+  }
+
+  /* ── Version history ── */
+  .version-row {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+    align-items: flex-start;
+  }
+
+  .version-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    font-weight: 600;
+    background: var(--navy);
+    color: #fff;
+    padding: 3px 10px;
+    border-radius: 20px;
+    white-space: nowrap;
+    margin-top: 2px;
+    flex-shrink: 0;
+  }
+
+  .version-tag.current {
+    background: var(--accent);
+  }
+
+  .version-items {
+    font-size: 13.5px;
+    color: var(--muted);
+  }
+
+  .version-items li {
+    margin-bottom: 3px;
+    list-style: none;
+    padding-left: 1rem;
+    position: relative;
+  }
+
+  .version-items li::before {
+    content: '·';
+    position: absolute;
+    left: 0;
+    color: var(--accent);
+    font-weight: 700;
+  }
+
+  /* ── Requirement badge ── */
+  .req-block {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--accent);
+    border-radius: 0 10px 10px 0;
+    padding: 1rem 1.25rem;
+    margin: 1rem 0;
+    font-size: 13.5px;
+  }
+
+  .req-block strong { color: var(--text); font-weight: 600; }
+
+  /* ── Scrollbar ── */
+  .sidebar::-webkit-scrollbar { width: 4px; }
+  .sidebar::-webkit-scrollbar-track { background: transparent; }
+  .sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 4px; }
+
+  /* ── Print / responsive ── */
+  @media print {
+    .sidebar { display: none; }
+    .main { margin-left: 0; }
+    .hero { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  }
+
+  @media (max-width: 900px) {
+    .sidebar { width: 220px; }
+    .main { margin-left: 220px; }
+    .content { padding: 2.5rem 2rem; }
+    .hero { padding: 3rem 2rem 2.5rem; }
+    .hero h1 { font-size: 34px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════ SIDEBAR ═══ -->
+<nav class="sidebar" aria-label="Table of contents">
+  <div class="sidebar-logo">
+    <span class="tool-name">DeshDash</span>
+    <span class="sub">User Manual</span>
+    <span class="version-badge">ver. 1.0</span>
+  </div>
+
+  <div class="nav-section-label">Getting Started</div>
+  <a href="#overview"     class="nav-link"><span class="nav-icon">🗺️</span> Overview</a>
+  <a href="#requirements" class="nav-link"><span class="nav-icon">⚙️</span> Requirements</a>
+  <a href="#launch"       class="nav-link"><span class="nav-icon">▶️</span> Launching</a>
+  <a href="#interface"    class="nav-link"><span class="nav-icon">🖥</span> Interface Layout</a>
+
+  <div class="nav-section-label">Data Tab</div>
+  <a href="#titles" class="nav-link"><span class="nav-icon">🏷️</span> Titles &amp; Placement</a>
+  <a href="#entry"   class="nav-link"><span class="nav-icon">📝</span> Entering State Data</a>
+  <a href="#csv"     class="nav-link"><span class="nav-icon">📋</span> Paste / Upload CSV</a>
+  <a href="#format"  class="nav-link"><span class="nav-icon">🔢</span> Value Formatting</a>
+
+  <div class="nav-section-label">Style Tab</div>
+  <a href="#scale-type" class="nav-link"><span class="nav-icon">🎨</span> Color Scale Type</a>
+  <a href="#scale-range" class="nav-link"><span class="nav-icon">📐</span> Range &amp; Midpoint</a>
+  <a href="#colors"     class="nav-link"><span class="nav-icon">🖌️</span> Borders &amp; Background</a>
+  <a href="#legend"     class="nav-link"><span class="nav-icon">🔑</span> Legend</a>
+
+  <div class="nav-section-label">Labels Tab</div>
+  <a href="#show"    class="nav-link"><span class="nav-icon">👁️</span> What to Show</a>
+  <a href="#leaders" class="nav-link"><span class="nav-icon">📌</span> Leader Lines &amp; Boxes</a>
+  <a href="#sizes"   class="nav-link"><span class="nav-icon">🔠</span> Label Sizes &amp; Colors</a>
+  <a href="#adjust"  class="nav-link"><span class="nav-icon">🎯</span> Adjust Label Position</a>
+
+  <div class="nav-section-label">Export Tab</div>
+  <a href="#dims"     class="nav-link"><span class="nav-icon">📏</span> Map Dimensions</a>
+  <a href="#download" class="nav-link"><span class="nav-icon">📁</span> Download Formats</a>
+
+  <div class="nav-section-label">Reference</div>
+  <a href="#tips"    class="nav-link"><span class="nav-icon">💡</span> Tips &amp; Tricks</a>
+  <a href="#faq"     class="nav-link"><span class="nav-icon">❓</span> Troubleshooting</a>
+  <a href="#history" class="nav-link"><span class="nav-icon">🕓</span> Version History</a>
+</nav>
+
+
+<!-- ════════════════════════════════════════ MAIN ════════ -->
+<div class="main">
+
+  <!-- Hero -->
+  <div class="hero">
+    <p class="hero-eyebrow">User Manual &nbsp;·&nbsp; Complete Guide</p>
+    <h1>DeshDash<br><span>ver. 1.0</span></h1>
+    <p class="hero-desc">Build state-wise choropleth maps of India — labels, legends, and export in one tool. Free and hosted online at <a href="https://anilyayavar.github.io/deshdash/" target="_blank" rel="noopener" style="color:#fff;text-decoration:underline">anilyayavar.github.io/deshdash</a> — just open the link, no installation or sign-up needed.</p>
+    <div class="hero-badges">
+      <span class="hero-badge featured">🗺️ Choropleth Maps</span>
+      <span class="hero-badge featured">📌 Leader-line Labels</span>
+      <span class="hero-badge featured">📁 SVG / PNG / HTML export</span>
+      <span class="hero-badge">Free &amp; hosted online</span>
+      <span class="hero-badge">No data uploaded</span>
+      <span class="hero-badge">Any modern browser</span>
+    </div>
+  </div>
+
+  <!-- ── Content ── -->
+  <div class="content">
+
+    <!-- ════ OVERVIEW ════ -->
+    <div class="section" id="overview">
+      <div class="section-header">
+        <div class="section-icon icon-blue">🗺️</div>
+        <h2>Overview</h2>
+      </div>
+
+      <p>DeshDash is a free, browser-based tool for creating professional India choropleth (shaded) maps from your own state-wise data. It's hosted online at <a href="https://anilyayavar.github.io/deshdash/" target="_blank" rel="noopener">anilyayavar.github.io/deshdash</a> — just open the link, no sign-up or installation required. Everything — the map library, India's boundary data, and all rendering logic — is bundled into the page itself, so once it has loaded, it keeps working even if your internet connection drops.</p>
+
+      <div class="feature-grid">
+        <div class="feature-card">
+          <span class="fc-icon">🎨</span>
+          <div class="fc-title">Sequential &amp; Diverging Scales</div>
+          <p>Choose a one-direction gradient for values that only go up, or a two-direction gradient around a midpoint for data that can be above/below a benchmark.</p>
+        </div>
+        <div class="feature-card">
+          <span class="fc-icon">📌</span>
+          <div class="fc-title">Smart Leader-line Labels</div>
+          <p>Small or awkwardly-shaped states/UTs get a clean floating label connected by a thin line — no cramped or overlapping text.</p>
+        </div>
+        <div class="feature-card">
+          <span class="fc-icon">📋</span>
+          <div class="fc-title">Paste or Upload CSV</div>
+          <p>Load state-wise data straight from Excel or a CSV file — auto-detects headers, delimiters, and common name variants/abbreviations.</p>
+        </div>
+        <div class="feature-card">
+          <span class="fc-icon">🎯</span>
+          <div class="fc-title">Live Label Position Nudging</div>
+          <p>Fine-tune any individual state's label position directly from the panel — no code editing required.</p>
+        </div>
+        <div class="feature-card">
+          <span class="fc-icon">🔑</span>
+          <div class="fc-title">Configurable Legend</div>
+          <p>Continuous gradient or discrete color-step legend, positioned and sized to fit your layout.</p>
+        </div>
+        <div class="feature-card">
+          <span class="fc-icon">📁</span>
+          <div class="fc-title">Multiple Export Formats</div>
+          <p>Download as vector SVG, high-resolution PNG, or a standalone interactive HTML file with hover tooltips.</p>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ════ REQUIREMENTS ════ -->
+    <div class="section" id="requirements">
+      <div class="section-header">
+        <div class="section-icon icon-gray">⚙️</div>
+        <h2>Requirements</h2>
+      </div>
+
+      <div class="req-block">
+        <strong>A modern web browser</strong> — Chrome, Edge, Firefox, or Safari.<br>
+        <strong>No installation, no account, no software to download</strong> — just an internet connection to load the page the first time.
+      </div>
+
+      <p>DeshDash works on <strong>Windows</strong>, <strong>macOS</strong>, <strong>Linux</strong>, and even tablets — anywhere a browser can open a webpage. India's map boundary data and the D3.js rendering library are both embedded directly inside the page, so after it loads once, it keeps working even without an internet connection — no separate files to manage.</p>
+
+      <table class="ref-table">
+        <thead>
+          <tr><th>Component</th><th>Minimum</th><th>Notes</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Browser</td><td>Any recent version</td><td>Chrome/Edge recommended for best export quality</td></tr>
+          <tr><td>Internet</td><td>Needed to open the page</td><td>Required each time you visit the link; once loaded, all map-building happens locally in your browser with no further server calls</td></tr>
+          <tr><td>Screen size</td><td>Desktop recommended</td><td>The two-panel layout works best on a wider screen</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+
+    <!-- ════ LAUNCHING ════ -->
+    <div class="section" id="launch">
+      <div class="section-header">
+        <div class="section-icon icon-blue">▶️</div>
+        <h2>Launching DeshDash</h2>
+      </div>
+
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <div class="step-title">Open the link</div>
+            <p>Visit <a href="https://anilyayavar.github.io/deshdash/" target="_blank" rel="noopener"><code>anilyayavar.github.io/deshdash</code></a> in any browser — no download, no installation, no account needed.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <div class="step-title">It loads instantly</div>
+            <p>The whole app — including India's map data — is bundled directly into that one page. Once it's loaded, all map-building happens locally in your browser — no data is sent to any server while you work. You'll still need internet to open the link again next time, unless you save a local copy (see below).</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <div class="step-title">Start building</div>
+            <p>The <b>Data</b> tab is active by default — enter a title and your state-wise figures to begin.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout info">
+        <span class="callout-icon">💡</span>
+        <p>Bookmark the link for quick access anytime. If you want a copy that opens without needing internet at all, use your browser's "Save As" (Ctrl+S) to save the page as a local file — the saved copy is fully self-contained and works the same way.</p>
+      </div>
+    </div>
+
+
+    <!-- ════ INTERFACE ════ -->
+    <div class="section" id="interface">
+      <div class="section-header">
+        <div class="section-icon icon-purple">🖥</div>
+        <h2>Interface Layout</h2>
+      </div>
+
+      <p>The application window is divided into two main areas:</p>
+
+      <table class="ref-table">
+        <thead>
+          <tr><th>Area</th><th>Location</th><th>Purpose</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Control panel</td><td>Left side, dark theme</td><td>All settings, organized into four tabs</td></tr>
+          <tr><td>Tab bar</td><td>Top of panel</td><td>Switch between Data, Style, Labels, and Export</td></tr>
+          <tr><td>Generate button</td><td>Bottom of panel</td><td>Renders/refreshes the map with current settings</td></tr>
+          <tr><td>Map preview</td><td>Right side, main area</td><td>Live view of your map as it's built</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Tabs</h3>
+      <p>Click any of the four tabs — <strong>Data</strong>, <strong>Style</strong>, <strong>Labels</strong>, or <strong>Export</strong> — to switch sections. Most controls apply live to the map preview as you adjust them; a few (like map size) need a click of <strong>Generate / Refresh Map</strong>.</p>
+    </div>
+
+
+    <!-- ════ TITLES ════ -->
+    <div class="section" id="titles">
+      <div class="section-header">
+        <div class="section-icon icon-blue">🏷️</div>
+        <h2>Titles &amp; Placement</h2>
+      </div>
+
+      <table class="ref-table">
+        <thead>
+          <tr><th>Control</th><th>What it does</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Title / Subtitle</td><td>Main heading and a smaller line beneath it (e.g. a financial year). Leave subtitle blank to omit it.</td></tr>
+          <tr><td>Source / Note</td><td>Small print at the bottom-left/right of the map — typically a data source citation and a units note (e.g. "Figures in ₹ Crore").</td></tr>
+          <tr><td>Title placement</td><td>See below.</td></tr>
+        </tbody>
+      </table>
+
+      <div class="card">
+        <div class="card-title">🖼️ Overlay (inside map)</div>
+        <p>The title floats inside the natural blank space above Jammu &amp; Kashmir, saving vertical space. Best for a short title with no subtitle.</p>
+      </div>
+      <div class="card">
+        <div class="card-title">📐 Above map (reserved space)</div>
+        <p>A dedicated band is added above the map exclusively for the title/subtitle, so nothing overlaps even with longer text. Use the Top padding slider to control how much space is reserved.</p>
+      </div>
+
+      <div class="callout tip">
+        <span class="callout-icon">✅</span>
+        <p>If your title and subtitle combination looks cramped, switch to <strong>Above map</strong> placement and increase the padding slider.</p>
+      </div>
+    </div>
+
+
+    <!-- ════ ENTRY ════ -->
+    <div class="section" id="entry">
+      <div class="section-header">
+        <div class="section-icon icon-green">📝</div>
+        <h2>Entering State Data</h2>
+      </div>
+
+      <p>The data table has three columns: a status dot, the State/UT name, and its numeric value.</p>
+
+      <table class="ref-table">
+        <thead>
+          <tr><th>Status dot</th><th>Meaning</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>🟢 Green</td><td>The state name was recognized and matched to the map</td></tr>
+          <tr><td>🔴 Red</td><td>The name wasn't recognized — check spelling or try a standard abbreviation</td></tr>
+          <tr><td>🟠 Amber</td><td>Row is empty or incomplete</td></tr>
+        </tbody>
+      </table>
+
+      <p>Use <strong>+ Add Row</strong> to add more states, or the <strong>×</strong> button on a row to delete it. State names typed here offer autocomplete suggestions as you type.</p>
+    </div>
+
+
+    <!-- ════ CSV ════ -->
+    <div class="section" id="csv">
+      <div class="section-header">
+        <div class="section-icon icon-green">📋</div>
+        <h2>Paste / Upload CSV</h2>
+      </div>
+
+      <p>For larger datasets, switch from the <strong>Table</strong> view to <strong>Paste CSV</strong> or <strong>Upload CSV</strong> using the buttons above the data grid.</p>
+
+      <div class="feature-grid">
+        <div class="feature-card">
+          <span class="fc-icon">📋</span>
+          <div class="fc-title">Paste CSV</div>
+          <p>Paste two columns of data (state name, value) directly into the text box, then click Parse &amp; Load. Supports comma- or tab-separated data copied straight from Excel.</p>
+        </div>
+        <div class="feature-card">
+          <span class="fc-icon">📁</span>
+          <div class="fc-title">Upload CSV</div>
+          <p>Choose a .csv file from your computer — it parses and loads automatically on selection, no extra click needed.</p>
+        </div>
+      </div>
+
+      <p>Both methods auto-detect whether the first line is a header row and skip it if so. State names can be full names, standard abbreviations (e.g. <code>MP</code>, <code>WB</code>, <code>UP</code>), or common alternate spellings (e.g. <code>Odisha</code>/<code>Orissa</code>, <code>Uttarakhand</code>/<code>Uttaranchal</code>, <code>Puducherry</code>/<code>Pondicherry</code>, <code>Keralam</code>/<code>Kerala</code>).</p>
+
+      <div class="callout warn">
+        <span class="callout-icon">⚠️</span>
+        <p>If a state doesn't match, double-check for extra spaces, unusual punctuation, or a name DeshDash doesn't recognize yet. Standard 2-letter state codes and most common name variants are supported.</p>
+      </div>
+    </div>
+
+
+    <!-- ════ FORMAT ════ -->
+    <div class="section" id="format">
+      <div class="section-header">
+        <div class="section-icon icon-green">🔢</div>
+        <h2>Value Formatting</h2>
+      </div>
+
+      <table class="ref-table">
+        <thead>
+          <tr><th>Control</th><th>What it does</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Prefix / Suffix</td><td>Text shown before/after every number — e.g. prefix <code>₹</code> and suffix <code>Cr</code> renders as <code>₹450 Cr</code></td></tr>
+          <tr><td>Decimal places</td><td><strong>Auto</strong> detects the decimal precision already present in your data (up to 3 places). Can also be fixed to 0–3 places manually.</td></tr>
+          <tr><td>Use thousand separators</td><td>Adds commas to large numbers (e.g. <code>12,45,000</code>)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+
+    <!-- ════ SCALE TYPE ════ -->
+    <div class="section" id="scale-type">
+      <div class="section-header">
+        <div class="section-icon icon-purple">🎨</div>
+        <h2>Color Scale Type</h2>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Sequential</div>
+        <p>A single-direction gradient (light → dark), best for data that only goes one way — e.g. population, income.</p>
+      </div>
+      <div class="card">
+        <div class="card-title">Diverging</div>
+        <p>A two-direction gradient around a midpoint (e.g. red → white → blue), best for data that can be positive or negative, or above/below a benchmark — e.g. growth rate vs. national average.</p>
+      </div>
+
+      <p>Each type offers a grid of built-in color schemes — click any swatch to select — plus a <strong>Custom</strong> option to pick your own gradient colors.</p>
+
+      <div class="callout info">
+        <span class="callout-icon">💡</span>
+        <p><strong>Reverse scale</strong> flips the direction of whichever scheme is selected — useful when a "darker = worse" scheme needs to become "darker = better" for your dataset.</p>
+      </div>
+    </div>
+
+
+    <!-- ════ SCALE RANGE ════ -->
+    <div class="section" id="scale-range">
+      <div class="section-header">
+        <div class="section-icon icon-purple">📐</div>
+        <h2>Scale Range &amp; Midpoint</h2>
+      </div>
+
+      <table class="ref-table">
+        <thead>
+          <tr><th>Control</th><th>What it does</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Auto min/max</td><td>When checked, the color scale automatically stretches from your data's lowest to highest value. Uncheck to set fixed Min/Max values manually — useful for comparing multiple maps on the same scale.</td></tr>
+          <tr><td>Midpoint value <em>(Diverging only)</em></td><td>Sets where the color scale "splits" between the two diverging colors. Leave blank to auto-center at the mean of your data; type a specific value (e.g. <code>0</code>) to divide colors at a meaningful benchmark instead. Works independently of the Auto min/max setting.</td></tr>
+          <tr><td>Steps</td><td><code>0</code> gives a smooth continuous gradient. Any other number (4–8) buckets the data into that many discrete color bands — often clearer for printed reports.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+
+    <!-- ════ COLORS ════ -->
+    <div class="section" id="colors">
+      <div class="section-header">
+        <div class="section-icon icon-purple">🖌️</div>
+        <h2>Borders &amp; Background</h2>
+      </div>
+
+      <table class="ref-table">
+        <thead>
+          <tr><th>Control</th><th>What it does</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>No-data fill</td><td>Color used for states with no value entered</td></tr>
+          <tr><td>Border color / width</td><td>State outline color and thickness</td></tr>
+          <tr><td>Background / ocean color</td><td>Fills the space outside India's boundary within the canvas</td></tr>
+          <tr><td>Background opacity</td><td>Only affects the SVG export — PNG exports always render a solid background</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+
+    <!-- ════ LEGEND ════ -->
+    <div class="section" id="legend">
+      <div class="section-header">
+        <div class="section-icon icon-purple">🔑</div>
+        <h2>Legend</h2>
+      </div>
+
+      <p><strong>Show legend</strong> toggles the color-key strip below the map. <strong>Position</strong> (left/center/right) and <strong>Width</strong> (as a % of map width) control its placement and size.</p>
+    </div>
+
+
+    <!-- ════ SHOW ════ -->
+    <div class="section" id="show">
+      <div class="section-header">
+        <div class="section-icon icon-blue">👁️</div>
+        <h2>What to Show</h2>
+      </div>
+
+      <p><strong>Show state name</strong>, <strong>Show value</strong>, and <strong>Abbreviate name</strong> (uses 2-letter codes instead of full names) control what's printed on/near each state.</p>
+    </div>
+
+
+    <!-- ════ LEADERS ════ -->
+    <div class="section" id="leaders">
+      <div class="section-header">
+        <div class="section-icon icon-blue">📌</div>
+        <h2>Leader Lines &amp; Boxes</h2>
+      </div>
+
+      <p>Small or geographically awkward states/UTs (Sikkim, Goa, Chandigarh, Andaman &amp; Nicobar, etc.) can't fit readable labels inside their own boundary. DeshDash draws a thin <strong>leader line</strong> from the state's center to a floating label box placed in open space nearby.</p>
+
+      <table class="ref-table">
+        <thead>
+          <tr><th>Control</th><th>What it does</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Show leader lines</td><td>Master toggle — if off, these states fall back to a plain inline label (may look cramped for very small states)</td></tr>
+          <tr><td>Line color / thickness</td><td>Styling for the connector line and its anchor dot</td></tr>
+          <tr><td>Label background box</td><td>Toggles the rounded box behind external labels, improving legibility over the colored map</td></tr>
+          <tr><td>Box fill color / opacity</td><td>Background color and transparency of the label box</td></tr>
+          <tr><td>Border color / width</td><td>Outline of the label box — set width to 0 for a borderless box</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+
+    <!-- ════ SIZES ════ -->
+    <div class="section" id="sizes">
+      <div class="section-header">
+        <div class="section-icon icon-blue">🔠</div>
+        <h2>Label Sizes &amp; Colors</h2>
+      </div>
+
+      <p>Two independent size groups exist because they're read against different backgrounds:</p>
+
+      <div class="card">
+        <div class="card-title">External Labels</div>
+        <p>Text inside leader-line boxes — small/NE states, UTs.</p>
+      </div>
+      <div class="card">
+        <div class="card-title">Inline Labels</div>
+        <p>Text drawn directly inside large states, e.g. Rajasthan, Madhya Pradesh.</p>
+      </div>
+
+      <p>Each group has separate <strong>Name size</strong> and <strong>Value size</strong> sliders. For inline labels, <strong>Auto color (contrast)</strong> automatically picks black or white text depending on how dark the underlying fill color is — turn it off to set manual name/value colors and a fixed opacity instead.</p>
+    </div>
+
+
+    <!-- ════ ADJUST ════ -->
+    <div class="section" id="adjust">
+      <div class="section-header">
+        <div class="section-icon icon-blue">🎯</div>
+        <h2>Adjust Label Position</h2>
+      </div>
+
+      <p>Leader-line labels have sensible default positions, but any map layout may need fine-tuning for specific states — e.g. two neighboring labels overlapping. This panel lets you nudge any individual state's label without touching code:</p>
+
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <div class="step-title">Pick a state</div>
+            <p>Choose from the State dropdown.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <div class="step-title">Nudge dx / dy</div>
+            <p><strong>dx</strong> (horizontal: negative = left, positive = right) and <strong>dy</strong> (vertical: negative = up, positive = down) — use the +/− buttons or type a value directly.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <div class="step-title">Optionally remove the leader line</div>
+            <p>Check <strong>No leader line (box only)</strong> for a label that floats without a connecting line — useful for tightly-packed island groups like Lakshadweep.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout warn">
+        <span class="callout-icon">⚠️</span>
+        <p>Position adjustments made here are session-only — they reset if you reload the page. If you find good values, keep a note of them for future sessions.</p>
+      </div>
+    </div>
+
+
+    <!-- ════ DIMS ════ -->
+    <div class="section" id="dims">
+      <div class="section-header">
+        <div class="section-icon icon-orange">📏</div>
+        <h2>Map Dimensions</h2>
+      </div>
+
+      <p>Set the pixel <strong>Width</strong> and <strong>Height</strong> of the exported map. Click <strong>Generate / Refresh Map</strong> after changing these to apply the new size.</p>
+    </div>
+
+
+    <!-- ════ DOWNLOAD ════ -->
+    <div class="section" id="download">
+      <div class="section-header">
+        <div class="section-icon icon-orange">📁</div>
+        <h2>Download Formats</h2>
+      </div>
+
+      <table class="ref-table">
+        <thead>
+          <tr><th>Format</th><th>Best for</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>SVG</td><td>Vector format — infinitely scalable and editable in Illustrator/Inkscape. Best for further design work.</td></tr>
+          <tr><td>PNG (2×)</td><td>High-resolution raster image — ideal for pasting into Word/PowerPoint reports or slides.</td></tr>
+          <tr><td>Interactive HTML</td><td>A standalone file with hover tooltips showing state name and value — works in any browser, no internet needed. Best for sharing digitally.</td></tr>
+          <tr><td>Print / Save as PDF</td><td>Opens your browser's print dialog, from which you can save directly as a PDF.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+
+    <!-- ════ TIPS ════ -->
+    <div class="section" id="tips">
+      <div class="section-header">
+        <div class="section-icon icon-blue">💡</div>
+        <h2>Tips &amp; Tricks</h2>
+      </div>
+
+      <div class="card">
+        <div class="card-title">📊 Use discrete steps for reports</div>
+        <p>5–6 color steps rather than a continuous gradient — readers map colors to legend values far more easily.</p>
+      </div>
+      <div class="card">
+        <div class="card-title">🏷️ Keep overlay titles short</div>
+        <p>Switch to "Above map" placement for longer titles or when using a subtitle.</p>
+      </div>
+      <div class="card">
+        <div class="card-title">📐 Comparing multiple maps</div>
+        <p>Turn off Auto min/max and set the same fixed range on all of them, so colors are directly comparable across years or datasets.</p>
+      </div>
+      <div class="card">
+        <div class="card-title">🎨 Choose diverging for centered data</div>
+        <p>Whenever your data has a natural center point — national average, zero growth, previous year's value — a diverging scale communicates it better than sequential.</p>
+      </div>
+      <div class="card">
+        <div class="card-title">📁 SVG for editing, PNG for final</div>
+        <p>Export as SVG if the map will be resized or edited further; use PNG only for the final, fixed-size version.</p>
+      </div>
+    </div>
+
+
+    <!-- ════ FAQ ════ -->
+    <div class="section" id="faq">
+      <div class="section-header">
+        <div class="section-icon icon-red">❓</div>
+        <h2>Troubleshooting / FAQ</h2>
+      </div>
+
+      <h3>My state isn't matching (red dot in the data table)</h3>
+      <p>Check for typos, extra spaces, or an unsupported name variant. Standard names, common alternate spellings, and 2-letter codes are all supported — try the full standard name if a shorthand doesn't match.</p>
+
+      <h3>I changed a slider but the map didn't update</h3>
+      <p>Most controls update live, but if the map appears unchanged, click <strong>⟳ Generate / Refresh Map</strong> to force a redraw.</p>
+
+      <h3>The legend or a label looks cut off / cramped</h3>
+      <p>Try reducing the relevant font size (Labels tab), or switch title placement to "Above map" and increase the top padding to free up space.</p>
+
+      <h3>Can I use my own state boundary data?</h3>
+      <p>Not in the current version — DeshDash ships with its own built-in India boundary data. Custom boundary support, including district-level maps, is planned for a future version.</p>
+    </div>
+
+
+    <!-- ════ VERSION HISTORY ════ -->
+    <div class="section" id="history">
+      <div class="section-header">
+        <div class="section-icon icon-gray">🕓</div>
+        <h2>Version History</h2>
+      </div>
+
+      <div class="version-row">
+        <span class="version-tag current">1.0</span>
+        <ul class="version-items">
+          <li>Initial public release — Data, Style, Labels, and Export tabs complete</li>
+          <li>Sequential and Diverging color scales with custom gradients</li>
+          <li>Leader-line labels with collision detection and per-state position adjustment</li>
+          <li>Paste CSV and Upload CSV data entry, with header/delimiter auto-detection</li>
+          <li>Title placement: Overlay (inside map) or Above map (reserved space)</li>
+          <li>Export as SVG, PNG (2×), interactive HTML, or print to PDF</li>
+          <li>Self-contained — D3.js and India's boundary data embedded directly in the page, no external libraries loaded</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div style="border-top: 1px solid var(--border); padding-top: 1.5rem; margin-top: 2rem; font-size: 12.5px; color: var(--muted);">
+      DeshDash ver. 1.0 &nbsp;·&nbsp; Hosted at anilyayavar.github.io/deshdash &nbsp;·&nbsp; No data leaves your browser &nbsp;·&nbsp;
+      Developed by <strong>Anil Kumar Goyal</strong> ·
+      <a href="https://www.linkedin.com/in/anil-kumar-goyal/" target="_blank" rel="noopener" style="color:var(--accent)">LinkedIn</a>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<script>
+  const links = document.querySelectorAll('.nav-link');
+  const sections = document.querySelectorAll('.section');
+
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        links.forEach(l => l.classList.remove('active'));
+        const active = document.querySelector(`.nav-link[href="#${e.target.id}"]`);
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { threshold: 0.3 });
+
+  sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>

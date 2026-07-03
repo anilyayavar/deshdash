@@ -621,6 +621,7 @@ function buildScale() {
     } else {
       colorScale = d3.scaleDiverging([mn,mid,mx], fn);
     }
+    colorScale._mid=mid;
   }
   colorScale._mn=mn; colorScale._mx=mx;
 }
@@ -930,30 +931,43 @@ function renderLegend(svg, W, H, BOT, LEGEND_H) {
   const fn = C.reverseScale ? t=>rawFn(1-t) : rawFn;
   const lg=svg.append('g').attr('class','legend-g');
 
+  // For diverging scales, value→t is piecewise (bends at the midpoint) instead of
+  // linear — the legend must mirror this exactly or it misrepresents the map's colors.
+  const mid = colorScale._mid;
+  const isDiv = C.scaleType!=='seq' && mid!==undefined;
+  const valToT = v => !isDiv ? (v-mn)/(mx-mn||1)
+    : (v<mid ? 0.5*(v-mn)/(mid-mn||1) : 0.5+0.5*(v-mid)/(mx-mid||1));
+  const tToVal = t => !isDiv ? mn+(mx-mn)*t
+    : (t<=0.5 ? mn+(mid-mn)*(t/0.5) : mid+(mx-mid)*((t-0.5)/0.5));
+  const valToX = v => lx + (v-mn)/(mx-mn||1)*lw;  // position is always linear in value
+
   if (C.steps>0) {
-    // Discrete blocks — one per quantize bucket, matching the map
-    const steps=+C.steps;  // coerce string from <select> to number
+    // Discrete blocks — bucket boundaries follow the same bend as the map's fill
+    const steps=+C.steps;
     const cols=d3.quantize(fn, steps);
-    const bw=lw/steps;
+    const boundaries=d3.range(steps+1).map(i=>tToVal(i/steps));
     cols.forEach((col,i)=>{
-      lg.append('rect').attr('x',lx+i*bw).attr('y',ly).attr('width',bw).attr('height',lh)
+      const x0=valToX(boundaries[i]), x1=valToX(boundaries[i+1]);
+      lg.append('rect').attr('x',x0).attr('y',ly).attr('width',Math.max(0,x1-x0)).attr('height',lh)
         .attr('fill',col).attr('stroke','#fff').attr('stroke-width',0.5);
     });
-    // Tick marks at bucket boundaries
-    const boundaries=d3.range(steps+1).map(i=>mn+(mx-mn)*i/steps);
-    const sc=d3.scaleLinear([0,steps],[lx,lx+lw]);
-    const ax=d3.axisBottom(sc).tickValues(d3.range(steps+1))
-      .tickFormat((_,i)=>fmt(boundaries[i]));
+    const sc=d3.scaleLinear([mn,mx],[lx,lx+lw]);
+    const ax=d3.axisBottom(sc).tickValues(boundaries).tickFormat(d=>fmt(d));
     const ag=lg.append('g').attr('transform',`translate(0,${ly+lh})`).call(ax);
     ag.select('.domain').attr('stroke','#999');
     ag.selectAll('text').attr('font-size',9).attr('fill','#555');
     ag.selectAll('.tick line').attr('stroke','#999');
   } else {
-    // Continuous gradient
+    // Continuous gradient — sample evenly across the value axis, but compute each
+    // stop's color via the bent t so the midpoint color lands at the right x position.
     const gid='lg'+Date.now();
     const defs=svg.append('defs');
     const grd=defs.append('linearGradient').attr('id',gid).attr('x1','0%').attr('x2','100%');
-    for (let i=0;i<=10;i++) grd.append('stop').attr('offset',i*10+'%').attr('stop-color',fn(i/10));
+    const N=20;
+    for (let i=0;i<=N;i++) {
+      const v=mn+(mx-mn)*i/N;
+      grd.append('stop').attr('offset',(i/N*100)+'%').attr('stop-color',fn(valToT(v)));
+    }
     lg.append('rect').attr('x',lx).attr('y',ly).attr('width',lw).attr('height',lh).attr('fill',`url(#${gid})`);
     const ax=d3.axisBottom(d3.scaleLinear([mn,mx],[lx,lx+lw])).ticks(5).tickFormat(d=>fmt(d));
     const ag=lg.append('g').attr('transform',`translate(0,${ly+lh})`).call(ax);

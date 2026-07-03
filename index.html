@@ -225,8 +225,6 @@ input[type=checkbox] { accent-color: #6c8dfa; width: 14px; height: 14px; cursor:
       <div id="sec-div" style="display:none">
         <div class="sl">Diverging Scheme</div>
         <div class="scheme-grid" id="div-grid"></div>
-        <label class="cl">Midpoint value <span style="color:#8a8fa8;font-size:9.5px">(blank = auto)</span></label>
-        <input type="number" id="inp-mid" placeholder="auto">
       </div>
       <!-- Custom diverging pickers -->
       <div id="sec-custom-div" style="display:none;margin:6px 0 4px">
@@ -244,6 +242,10 @@ input[type=checkbox] { accent-color: #6c8dfa; width: 14px; height: 14px; cursor:
       <div id="manual-range" style="display:none">
         <label class="cl">Min</label><input type="number" id="inp-min" value="0">
         <label class="cl">Max</label><input type="number" id="inp-max" value="100">
+        <div id="mid-wrap" style="display:none;margin-top:8px">
+          <label class="cl">Midpoint value <span style="color:#8a8fa8;font-size:9.5px">(diverging scale only)</span></label>
+          <div class="rr"><input type="range" id="rng-mid" min="0" max="100" step="1" value="50"><span id="lbl-mid">50</span></div>
+        </div>
       </div>
       <label class="cl">Steps (0 = continuous gradient)</label>
       <select id="sel-steps">
@@ -606,11 +608,10 @@ function buildScale() {
       ? d3.scaleQuantize([mn,mx], d3.quantize(fn,steps))
       : d3.scaleSequential([mn,mx], fn);
   } else {
-    // Midpoint is independent of the min/max auto-range toggle: a typed value is
-    // always honored; only a blank field falls back to the data's mean.
+    // In auto-range mode (or if the slider hasn't produced a value yet) the
+    // midpoint silently defaults to the mean — the slider UI only appears in
+    // manual-range mode, where C.mid always carries an explicit number.
     const mid = (C.mid===null || isNaN(C.mid)) ? (mn+mx)/2 : C.mid;
-    const midEl=document.getElementById('inp-mid');
-    if (midEl && (C.mid===null || isNaN(C.mid))) midEl.placeholder='auto: '+Math.round(mid);
     if (steps>0) {
       const cols=d3.quantize(fn,steps);
       colorScale = v => {
@@ -1138,9 +1139,11 @@ function readCfg() {
   C.autoRange=document.getElementById('chk-auto').checked;
   C.min=parseFloat(document.getElementById('inp-min').value)||0;
   C.max=parseFloat(document.getElementById('inp-max').value)||100;
-  // Blank/empty means "auto" — keep as null so buildScale() can tell "unset" from "0"
-  const midRaw=document.getElementById('inp-mid').value.trim();
-  C.mid=midRaw==='' ? null : parseFloat(midRaw);
+  // Midpoint slider only applies in manual-range diverging mode; otherwise null
+  // signals buildScale() to fall back to the auto mean.
+  C.mid=(C.scaleType==='div' && !C.autoRange)
+    ? parseFloat(document.getElementById('rng-mid').value)
+    : null;
   C.reverseScale=document.getElementById('chk-rev').checked;
   C.steps=document.getElementById('sel-steps').value;
   C.nodataColor=document.getElementById('clr-nd').value;
@@ -1309,6 +1312,37 @@ function init() {
   wireRange('rng-tpad','lbl-tpad');
 
   // Style tab (live)
+  // Midpoint slider is only meaningful for a diverging scale in manual-range mode
+  // (in auto mode there's no fixed min/max to bound it, so it silently uses the mean).
+  function updateMidWrapVisibility() {
+    document.getElementById('mid-wrap').style.display =
+      (C.scaleType==='div' && !C.autoRange) ? '' : 'none';
+  }
+  // Rebuilds the slider's min/max bounds from the current Min/Max fields, clamping
+  // (or re-centering) its value so it never points outside the range it's bounding.
+  function syncMidSliderBounds(resetToMean) {
+    const mn=parseFloat(document.getElementById('inp-min').value)||0;
+    const mx=parseFloat(document.getElementById('inp-max').value)||100;
+    const rng=document.getElementById('rng-mid');
+    // Read the current value BEFORE touching min/max — browsers auto-clamp a range
+    // input's value the instant its bounds change, so reading it after would always
+    // report the already-shifted number, making a fixed midpoint appear to "jump."
+    let v=parseFloat(rng.value);
+    if (resetToMean || isNaN(v)) v=(mn+mx)/2;
+    else if (v<mn) v=mn;       // still fix it in place, just clamp to the nearest edge
+    else if (v>mx) v=mx;       // (not reset to mean) when it truly falls outside
+    rng.min=mn; rng.max=mx;
+    // Step size always matches the data's own decimal precision: whole-number data
+    // (0 decimals) steps by 1, e.g. 2-decimal data (like 2.34) steps by 0.01 — no
+    // arbitrary span-based fraction that could land on non-integer values for
+    // whole-number data.
+    const dp = C.decimals==='auto' ? autoDecimals() : (parseInt(C.decimals)||0);
+    rng.step = dp>0 ? Math.pow(10,-dp) : 1;
+    rng.value=v;
+    document.getElementById('lbl-mid').textContent=fmt2(v);
+  }
+  function fmt2(v){ return Math.round(v*100)/100; }
+
   document.getElementById('sel-scale').addEventListener('change',e=>{
     C.scaleType=e.target.value;
     document.getElementById('sec-seq').style.display=C.scaleType==='seq'?'':'none';
@@ -1317,17 +1351,39 @@ function init() {
     const divCustom=document.getElementById('sec-custom-div');
     if(seqCustom) seqCustom.style.display='none';
     if(divCustom) divCustom.style.display='none';
+    updateMidWrapVisibility();
+    if (C.scaleType==='div' && !C.autoRange) syncMidSliderBounds(true);
     liveRender();
   });
   document.getElementById('sel-steps').addEventListener('change',liveRender);
   document.getElementById('chk-auto').addEventListener('change',e=>{
     C.autoRange=e.target.checked;
     document.getElementById('manual-range').style.display=C.autoRange?'none':'';
+    // Switching to manual: seed the Min/Max fields with the data's actual current
+    // range instead of leaving them at arbitrary hardcoded defaults (0/100).
+    if (!C.autoRange) {
+      const vals=Object.values(userData).filter(v=>v!==null&&!isNaN(v)).map(Number);
+      if (vals.length) {
+        document.getElementById('inp-min').value = colorScale?._mn ?? d3.min(vals);
+        document.getElementById('inp-max').value = colorScale?._mx ?? d3.max(vals);
+      }
+    }
+    updateMidWrapVisibility();
+    if (C.scaleType==='div' && !C.autoRange) syncMidSliderBounds(true);
     liveRender();
   });
-  document.getElementById('inp-min').addEventListener('input',liveRender);
-  document.getElementById('inp-max').addEventListener('input',liveRender);
-  document.getElementById('inp-mid').addEventListener('input',liveRender);
+  document.getElementById('inp-min').addEventListener('input',()=>{
+    if (C.scaleType==='div' && !C.autoRange) syncMidSliderBounds(false);
+    liveRender();
+  });
+  document.getElementById('inp-max').addEventListener('input',()=>{
+    if (C.scaleType==='div' && !C.autoRange) syncMidSliderBounds(false);
+    liveRender();
+  });
+  document.getElementById('rng-mid').addEventListener('input',e=>{
+    document.getElementById('lbl-mid').textContent=fmt2(parseFloat(e.target.value));
+    liveRender();
+  });
   document.getElementById('clr-nd').addEventListener('input',liveRender);
   document.getElementById('clr-brd').addEventListener('input',liveRender);
   document.getElementById('clr-bg').addEventListener('input',liveRender);

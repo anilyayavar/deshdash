@@ -594,7 +594,7 @@
     <p class="hero-desc">Build state-wise choropleth maps of India — labels, legends, and export in one tool. Free and hosted online at <a href="https://anilyayavar.github.io/deshdash/" target="_blank" rel="noopener" style="color:#fff;text-decoration:underline">anilyayavar.github.io/deshdash</a> — just open the link, no installation or sign-up needed.</p>
     <div class="hero-badges">
       <span class="hero-badge featured">🗺️ Choropleth Maps</span>
-      <span class="hero-badge featured">📌 Leader-line Labels</span>
+      <span class="hero-badge featured">🎨 Professional Color Palettes</span>
       <span class="hero-badge featured">📁 SVG / PNG / HTML export</span>
       <span class="hero-badge">Free &amp; hosted online</span>
       <span class="hero-badge">No data uploaded</span>
@@ -621,9 +621,9 @@
           <p>Choose a one-direction gradient for values that only go up, or a two-direction gradient around a midpoint for data that can be above/below a benchmark.</p>
         </div>
         <div class="feature-card">
-          <span class="fc-icon">📌</span>
-          <div class="fc-title">Smart Leader-line Labels</div>
-          <p>Small or awkwardly-shaped states/UTs get a clean floating label connected by a thin line — no cramped or overlapping text.</p>
+          <span class="fc-icon">🎨</span>
+          <div class="fc-title">Trusted Color Palettes</div>
+          <p>Built-in schemes are drawn from ColorBrewer — a well-known color system designed specifically for maps, so gradients stay easy to read and colorblind-friendly out of the box.</p>
         </div>
         <div class="feature-card">
           <span class="fc-icon">📋</span>
@@ -887,7 +887,7 @@
         </thead>
         <tbody>
           <tr><td>Auto min/max</td><td>When checked, the color scale automatically stretches from your data's lowest to highest value. Uncheck to set fixed Min/Max values manually — useful for comparing multiple maps on the same scale.</td></tr>
-          <tr><td>Midpoint value <em>(Diverging only)</em></td><td>Sets where the color scale "splits" between the two diverging colors. Leave blank to auto-center at the mean of your data; type a specific value (e.g. <code>0</code>) to divide colors at a meaningful benchmark instead. Works independently of the Auto min/max setting.</td></tr>
+          <tr><td>Midpoint slider <em>(Diverging only, manual range)</em></td><td>Appears below Min/Max only when Auto min/max is unchecked and the scale type is Diverging. Drag it to set where the color scale "splits" between the two diverging colors — bounded by your current Min/Max. Defaults to the midpoint of your range and stays fixed even if you later adjust Min/Max, unless it falls outside the new range.</td></tr>
           <tr><td>Steps</td><td><code>0</code> gives a smooth continuous gradient. Any other number (4–8) buckets the data into that many discrete color bands — often clearer for printed reports.</td></tr>
         </tbody>
       </table>

@@ -225,8 +225,8 @@ input[type=checkbox] { accent-color: #6c8dfa; width: 14px; height: 14px; cursor:
       <div id="sec-div" style="display:none">
         <div class="sl">Diverging Scheme</div>
         <div class="scheme-grid" id="div-grid"></div>
-        <label class="cl">Midpoint value</label>
-        <input type="number" id="inp-mid" value="0">
+        <label class="cl">Midpoint value <span style="color:#8a8fa8;font-size:9.5px">(blank = auto)</span></label>
+        <input type="number" id="inp-mid" placeholder="auto">
       </div>
       <!-- Custom diverging pickers -->
       <div id="sec-custom-div" style="display:none;margin:6px 0 4px">
@@ -606,11 +606,11 @@ function buildScale() {
       ? d3.scaleQuantize([mn,mx], d3.quantize(fn,steps))
       : d3.scaleSequential([mn,mx], fn);
   } else {
-    // Auto-mid: use mean of data range when autoRange is on; otherwise use user-set mid
-    const mid = C.autoRange ? (mn+mx)/2 : (parseFloat(C.mid)||0);
-    // Update the midpoint display so user can see what was used
+    // Midpoint is independent of the min/max auto-range toggle: a typed value is
+    // always honored; only a blank field falls back to the data's mean.
+    const mid = (C.mid===null || isNaN(C.mid)) ? (mn+mx)/2 : C.mid;
     const midEl=document.getElementById('inp-mid');
-    if (midEl && C.autoRange) midEl.placeholder='auto: '+Math.round(mid);
+    if (midEl && (C.mid===null || isNaN(C.mid))) midEl.placeholder='auto: '+Math.round(mid);
     if (steps>0) {
       const cols=d3.quantize(fn,steps);
       colorScale = v => {
@@ -1124,7 +1124,9 @@ function readCfg() {
   C.autoRange=document.getElementById('chk-auto').checked;
   C.min=parseFloat(document.getElementById('inp-min').value)||0;
   C.max=parseFloat(document.getElementById('inp-max').value)||100;
-  C.mid=parseFloat(document.getElementById('inp-mid').value)||0;
+  // Blank/empty means "auto" — keep as null so buildScale() can tell "unset" from "0"
+  const midRaw=document.getElementById('inp-mid').value.trim();
+  C.mid=midRaw==='' ? null : parseFloat(midRaw);
   C.reverseScale=document.getElementById('chk-rev').checked;
   C.steps=document.getElementById('sel-steps').value;
   C.nodataColor=document.getElementById('clr-nd').value;

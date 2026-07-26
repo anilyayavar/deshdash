@@ -3,1208 +3,510 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DeshDash — User Manual</title>
+<title>DeshDash — Help &amp; User Guide</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400&display=swap');
-
-  :root {
-    --navy:   #1A237E;
-    --accent: #4F6AF5;
-    --light-accent: #D6DCFF;
-    --success: #27AE60;
-    --warn: #E67E22;
-    --danger: #E84545;
-    --text: #1E2235;
-    --muted: #5A6178;
-    --border: #DDE2F0;
-    --bg: #F4F6FB;
-    --card: #FFFFFF;
-    --code-bg: #F0F3FF;
-  }
-
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-  html { scroll-behavior: smooth; }
-
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    font-size: 15px;
-    line-height: 1.75;
-  }
-
-  /* ── Sidebar nav ── */
-  .sidebar {
-    position: fixed;
-    top: 0; left: 0;
-    width: 260px;
-    height: 100vh;
-    background: var(--navy);
-    overflow-y: auto;
-    z-index: 100;
-    padding-bottom: 2rem;
-  }
-
-  .sidebar-logo {
-    padding: 2rem 1.5rem 1rem;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-    margin-bottom: 0.75rem;
-  }
-
-  .sidebar-logo .tool-name {
-    font-family: 'Playfair Display', serif;
-    font-size: 18px;
-    color: #fff;
-    display: block;
-  }
-
-  .sidebar-logo .version-badge {
-    display: inline-block;
-    margin-top: 6px;
-    background: var(--accent);
-    color: #fff;
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.07em;
-    padding: 2px 10px;
-    border-radius: 20px;
-    font-family: 'DM Mono', monospace;
-  }
-
-  .sidebar-logo .sub {
-    display: block;
-    font-size: 11px;
-    color: rgba(255,255,255,0.45);
-    margin-top: 4px;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-  }
-
-  .nav-section-label {
-    font-size: 10px;
-    font-weight: 600;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: rgba(255,255,255,0.35);
-    padding: 1.2rem 1.5rem 0.4rem;
-  }
-
-  .nav-link {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 0.5rem 1.5rem;
-    font-size: 13.5px;
-    color: rgba(255,255,255,0.7);
-    text-decoration: none;
-    border-left: 3px solid transparent;
-    transition: all 0.15s;
-  }
-
-  .nav-link:hover {
-    color: #fff;
-    background: rgba(255,255,255,0.06);
-    border-left-color: var(--accent);
-  }
-
-  .nav-link.active {
-    color: #fff;
-    background: rgba(79,106,245,0.2);
-    border-left-color: #fff;
-  }
-
-  .nav-icon {
-    font-size: 15px;
-    opacity: 0.75;
-    flex-shrink: 0;
-  }
-
-  /* ── Main content ── */
-  .main {
-    margin-left: 260px;
-    min-height: 100vh;
-  }
-
-  /* ── Cover hero ── */
-  .hero {
-    background: linear-gradient(135deg, var(--navy) 0%, #2a3a8f 50%, #3d52c4 100%);
-    padding: 5rem 4rem 4rem;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .hero::before {
-    content: '';
-    position: absolute;
-    top: -80px; right: -80px;
-    width: 400px; height: 400px;
-    border: 1px solid rgba(255,255,255,0.06);
-    border-radius: 50%;
-  }
-
-  .hero::after {
-    content: '';
-    position: absolute;
-    bottom: -120px; right: 80px;
-    width: 280px; height: 280px;
-    border: 1px solid rgba(255,255,255,0.04);
-    border-radius: 50%;
-  }
-
-  .hero-eyebrow {
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: rgba(255,255,255,0.5);
-    margin-bottom: 1rem;
-  }
-
-  .hero h1 {
-    font-family: 'Playfair Display', serif;
-    font-size: 48px;
-    color: #fff;
-    line-height: 1.1;
-    margin-bottom: 1rem;
-  }
-
-  .hero h1 span {
-    color: #C5CEFF;
-  }
-
-  .hero-desc {
-    font-size: 16px;
-    color: rgba(255,255,255,0.65);
-    max-width: 520px;
-    line-height: 1.8;
-    margin-bottom: 2.5rem;
-  }
-
-  .hero-badges {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-  }
-
-  .hero-badge {
-    background: rgba(255,255,255,0.1);
-    border: 1px solid rgba(255,255,255,0.15);
-    color: rgba(255,255,255,0.85);
-    font-size: 12px;
-    padding: 5px 14px;
-    border-radius: 20px;
-    font-weight: 500;
-  }
-
-  .hero-badge.featured {
-    background: var(--accent);
-    border-color: var(--accent);
-    color: #fff;
-  }
-
-  /* ── Content area ── */
-  .content {
-    padding: 3.5rem 4rem;
-    max-width: 860px;
-  }
-
-  /* ── Sections ── */
-  .section {
-    margin-bottom: 4rem;
-    scroll-margin-top: 2rem;
-  }
-
-  .section-header {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    margin-bottom: 1.5rem;
-    padding-bottom: 0.75rem;
-    border-bottom: 2px solid var(--border);
-  }
-
-  .section-icon {
-    width: 40px; height: 40px;
-    border-radius: 10px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 18px;
-    flex-shrink: 0;
-  }
-
-  .icon-blue   { background: #E6F1FF; color: var(--accent); }
-  .icon-green  { background: #E6F5EE; color: var(--success); }
-  .icon-orange { background: #FEF0E6; color: var(--warn); }
-  .icon-red    { background: #FEECEC; color: var(--danger); }
-  .icon-purple { background: var(--light-accent); color: var(--navy); }
-  .icon-gray   { background: #F0F0F0; color: #555; }
-
-  .section h2 {
-    font-family: 'Playfair Display', serif;
-    font-size: 26px;
-    font-weight: 700;
-    color: var(--navy);
-    letter-spacing: -0.01em;
-  }
-
-  h3 {
-    font-size: 15px;
-    font-weight: 600;
-    color: var(--text);
-    margin: 1.75rem 0 0.6rem;
-  }
-
-  p { margin-bottom: 0.85rem; color: var(--muted); }
-
-  /* ── Cards ── */
-  .card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 1.5rem;
-    margin-bottom: 1rem;
-  }
-
-  .card-title {
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--text);
-    margin-bottom: 0.4rem;
-  }
-
-  .card p { margin-bottom: 0; font-size: 13.5px; }
-
-  /* Feature cards grid */
-  .feature-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-  }
-
-  .feature-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 1.25rem;
-  }
-
-  .feature-card .fc-icon {
-    font-size: 22px;
-    margin-bottom: 0.75rem;
-    display: block;
-  }
-
-  .feature-card .fc-title {
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--text);
-    margin-bottom: 0.35rem;
-  }
-
-  .feature-card p {
-    font-size: 13px;
-    margin-bottom: 0;
-    line-height: 1.6;
-  }
-
-  /* ── Step-by-step ── */
-  .steps {
-    counter-reset: step;
-    margin: 1rem 0 1.5rem;
-  }
-
-  .step {
-    display: flex;
-    gap: 1.25rem;
-    margin-bottom: 1.25rem;
-    align-items: flex-start;
-  }
-
-  .step-num {
-    counter-increment: step;
-    width: 30px; height: 30px;
-    border-radius: 50%;
-    background: var(--navy);
-    color: #fff;
-    font-size: 13px;
-    font-weight: 600;
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
-    margin-top: 2px;
-  }
-
-  .step-body .step-title {
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--text);
-    margin-bottom: 0.2rem;
-  }
-
-  .step-body p {
-    font-size: 13.5px;
-    margin-bottom: 0;
-    line-height: 1.65;
-  }
-
-  /* ── Info / tip / warning boxes ── */
-  .callout {
-    border-radius: 10px;
-    padding: 1rem 1.25rem;
-    margin: 1.25rem 0;
-    display: flex;
-    gap: 12px;
-    align-items: flex-start;
-  }
-
-  .callout-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
-
-  .callout p { margin-bottom: 0; font-size: 13.5px; }
-
-  .callout.tip    { background: #E6F5EE; border: 1px solid #B2DFCC; }
-  .callout.tip p  { color: #1a5c3a; }
-  .callout.tip .callout-icon { color: var(--success); }
-
-  .callout.warn    { background: #FEF6EC; border: 1px solid #F8D7A8; }
-  .callout.warn p  { color: #7a4c0c; }
-  .callout.warn .callout-icon { color: var(--warn); }
-
-  .callout.info    { background: #EEF2FF; border: 1px solid #C5CEFF; }
-  .callout.info p  { color: #2d3a9e; }
-  .callout.info .callout-icon { color: var(--accent); }
-
-  /* ── Code / keyboard ── */
-  kbd {
-    display: inline-block;
-    background: #F0F3FF;
-    border: 1px solid #C5CEFF;
-    border-bottom-width: 2px;
-    border-radius: 5px;
-    padding: 1px 7px;
-    font-family: 'DM Mono', monospace;
-    font-size: 12px;
-    color: var(--navy);
-  }
-
-  code {
-    font-family: 'DM Mono', monospace;
-    background: var(--code-bg);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 1px 6px;
-    font-size: 12.5px;
-    color: var(--navy);
-  }
-
-  /* ── Named pill ── */
-  .filename-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background: var(--code-bg);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 3px 12px 3px 8px;
-    font-family: 'DM Mono', monospace;
-    font-size: 12px;
-    color: var(--navy);
-    margin: 2px 3px;
-  }
-
-  .filename-pill .dot {
-    width: 7px; height: 7px;
-    border-radius: 50%;
-    flex-shrink: 0;
-  }
-
-  .dot-blue   { background: var(--accent); }
-  .dot-green  { background: var(--success); }
-  .dot-orange { background: var(--warn); }
-
-  /* ── Quick-ref table ── */
-  .ref-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 13.5px;
-    margin: 1rem 0 1.5rem;
-    background: var(--card);
-    border-radius: 10px;
-    overflow: hidden;
-    border: 1px solid var(--border);
-  }
-
-  .ref-table th {
-    text-align: left;
-    padding: 10px 16px;
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--muted);
-    background: var(--bg);
-    border-bottom: 1px solid var(--border);
-  }
-
-  .ref-table td {
-    padding: 10px 16px;
-    color: var(--muted);
-    border-bottom: 1px solid var(--border);
-    vertical-align: top;
-  }
-
-  .ref-table tr:last-child td { border-bottom: none; }
-
-  .ref-table td:first-child {
-    font-weight: 600;
-    color: var(--text);
-    white-space: nowrap;
-  }
-
-  /* ── Version history ── */
-  .version-row {
-    display: flex;
-    gap: 1rem;
-    margin-bottom: 1.25rem;
-    align-items: flex-start;
-  }
-
-  .version-tag {
-    font-family: 'DM Mono', monospace;
-    font-size: 12px;
-    font-weight: 600;
-    background: var(--navy);
-    color: #fff;
-    padding: 3px 10px;
-    border-radius: 20px;
-    white-space: nowrap;
-    margin-top: 2px;
-    flex-shrink: 0;
-  }
-
-  .version-tag.current {
-    background: var(--accent);
-  }
-
-  .version-items {
-    font-size: 13.5px;
-    color: var(--muted);
-  }
-
-  .version-items li {
-    margin-bottom: 3px;
-    list-style: none;
-    padding-left: 1rem;
-    position: relative;
-  }
-
-  .version-items li::before {
-    content: '·';
-    position: absolute;
-    left: 0;
-    color: var(--accent);
-    font-weight: 700;
-  }
-
-  /* ── Requirement badge ── */
-  .req-block {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-left: 4px solid var(--accent);
-    border-radius: 0 10px 10px 0;
-    padding: 1rem 1.25rem;
-    margin: 1rem 0;
-    font-size: 13.5px;
-  }
-
-  .req-block strong { color: var(--text); font-weight: 600; }
-
-  /* ── Scrollbar ── */
-  .sidebar::-webkit-scrollbar { width: 4px; }
-  .sidebar::-webkit-scrollbar-track { background: transparent; }
-  .sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 4px; }
-
-  /* ── Print / responsive ── */
-  @media print {
-    .sidebar { display: none; }
-    .main { margin-left: 0; }
-    .hero { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
-  }
-
-  @media (max-width: 900px) {
-    .sidebar { width: 220px; }
-    .main { margin-left: 220px; }
-    .content { padding: 2.5rem 2rem; }
-    .hero { padding: 3rem 2rem 2.5rem; }
-    .hero h1 { font-size: 34px; }
-  }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #eef0f4; color: #1e2430; line-height: 1.6;
+}
+header {
+  background: linear-gradient(135deg, #1a1a2e, #14142a);
+  color: #f0f2f6; padding: 22px 24px 18px; text-align: center;
+  border-bottom: 3px solid #2a2a4a; position: relative;
+}
+header h1 { font-size: 22px; font-weight: 700; letter-spacing: 0.3px; }
+header p { font-size: 13px; color: #9aa3c4; margin-top: 6px; }
+header a.back {
+  position: absolute; top: 18px; left: 20px; font-size: 12px; color: #8aabff;
+  text-decoration: none; border: 1px solid #3a4a7a; border-radius: 12px;
+  padding: 4px 12px; background: #1a1a3a;
+}
+#tab-bar {
+  display: flex; flex-wrap: wrap; gap: 6px; justify-content: center;
+  background: #14142a; padding: 10px 14px; position: sticky; top: 0; z-index: 20;
+  border-bottom: 2px solid #2a2a4a;
+}
+.tab-btn {
+  padding: 8px 16px; font-size: 12.5px; font-weight: 700; color: #8890b8;
+  background: #1e1e3a; border: 1px solid #2f2f55; border-radius: 20px;
+  cursor: pointer; letter-spacing: 0.2px; transition: all 0.15s;
+}
+.tab-btn:hover { color: #c0c6ea; border-color: #4a4a80; }
+.tab-btn.active { color: #fff; }
+.tab-btn[data-tab="getting-started"].active { background: #4a5fd6; border-color: #4a5fd6; }
+.tab-btn[data-tab="highlights"].active { background: #f0b429; border-color: #f0b429; color: #3a2600; }
+.tab-btn[data-tab="univariate"].active { background: #7c5cff; border-color: #7c5cff; }
+.tab-btn[data-tab="bivariate"].active { background: #2dd4bf; border-color: #2dd4bf; color: #0a1a18; }
+.tab-btn[data-tab="categorical"].active { background: #f5a623; border-color: #f5a623; color: #241800; }
+.tab-btn[data-tab="annotations"].active { background: #ff6b9d; border-color: #ff6b9d; color: #2a0a15; }
+.tab-btn[data-tab="best-practices"].active { background: #2ecc71; border-color: #2ecc71; color: #0a2a16; }
+.tab-btn[data-tab="reference"].active { background: #6a6f90; border-color: #6a6f90; }
+
+main { max-width: 900px; margin: 0 auto; padding: 32px 24px 60px; }
+.panel { display: none; }
+.panel.active { display: block; animation: fadein 0.15s ease; }
+@keyframes fadein { from { opacity: 0; } to { opacity: 1; } }
+
+.mode-banner {
+  border-radius: 10px; padding: 16px 20px; margin-bottom: 24px; color: #fff;
+  font-size: 14px; line-height: 1.6;
+}
+.mode-banner b { font-weight: 700; }
+#panel-univariate .mode-banner { background: linear-gradient(135deg, #7c5cff, #5a3ddb); }
+#panel-bivariate .mode-banner { background: linear-gradient(135deg, #2dd4bf, #189c8c); color: #08201d; }
+#panel-categorical .mode-banner { background: linear-gradient(135deg, #f5a623, #c9820a); color: #241800; }
+#panel-annotations .mode-banner { background: linear-gradient(135deg, #ff6b9d, #d43d70); }
+#panel-getting-started .mode-banner { background: linear-gradient(135deg, #4a5fd6, #34409e); }
+#panel-highlights .mode-banner { background: linear-gradient(135deg, #f0b429, #c98a0a); color: #3a2600; }
+#panel-best-practices .mode-banner { background: linear-gradient(135deg, #2ecc71, #1e9e5a); color: #0a2a16; }
+
+h2 {
+  font-size: 17px; font-weight: 700; color: #14142a; margin: 30px 0 10px;
+  padding-bottom: 6px; border-bottom: 2px solid #dde1ee;
+}
+h2:first-of-type { margin-top: 0; }
+h3 { font-size: 13.5px; font-weight: 700; color: #2a2a4a; margin: 18px 0 6px; text-transform: uppercase; letter-spacing: 0.3px; }
+h4 { font-size: 13.5px; font-weight: 700; color: #14142a; margin: 14px 0 4px; }
+p { font-size: 13.5px; color: #3a3f55; margin: 8px 0; }
+ul, ol { margin: 8px 0 8px 22px; font-size: 13.5px; color: #3a3f55; }
+li { margin: 4px 0; }
+code {
+  background: #e4e7f2; color: #2a2a4a; padding: 1px 6px; border-radius: 4px;
+  font-size: 12.5px; font-family: 'Consolas', monospace;
+}
+b { color: #14142a; }
+
+.card-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 12px; margin: 14px 0 20px;
+}
+.mode-card {
+  border-radius: 8px; padding: 14px; color: #fff; box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+}
+.mode-card b { display: block; font-size: 14px; margin-bottom: 4px; color: #fff; }
+.mode-card span { font-size: 12px; opacity: 0.92; }
+.mode-card.univariate { background: linear-gradient(135deg, #7c5cff, #5a3ddb); }
+.mode-card.bivariate { background: linear-gradient(135deg, #2dd4bf, #189c8c); color: #08201d; }
+.mode-card.bivariate b { color: #08201d; }
+.mode-card.categorical { background: linear-gradient(135deg, #f5a623, #c9820a); color: #241800; }
+.mode-card.categorical b { color: #241800; }
+.mode-card.annotations { background: linear-gradient(135deg, #ff6b9d, #d43d70); }
+
+.feat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 10px; margin: 10px 0 22px; }
+.feat-card { background: #fff; border: 1px solid #dde1ee; border-left: 4px solid #f0b429; border-radius: 6px; padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+.feat-card b { display: block; font-size: 13px; color: #14142a; margin-bottom: 3px; }
+.feat-card span { font-size: 12.5px; color: #4a4f68; }
+
+.bp-list { list-style: none; margin: 10px 0 22px; padding: 0; }
+.bp-list li { background: #fff; border: 1px solid #dde1ee; border-left: 4px solid #2ecc71; border-radius: 6px; padding: 10px 14px; margin: 8px 0; font-size: 13px; color: #2a2f45; }
+.bp-list b { color: #14142a; }
+
+.example-box { background: #f7f8fc; border: 1px solid #dde1ee; border-radius: 8px; padding: 4px 18px 16px; margin: 6px 0 24px; }
+.example-box h4 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.4px; color: #6a6f90; margin-top: 16px; }
+.example-box table { margin: 6px 0 4px; background: #fff; }
+.example-box table code { background: #eef0f8; }
+.example-box .result { font-size: 13px; color: #2a2f45; margin: 6px 0 0; padding: 10px 12px; background: #fff; border-radius: 6px; border: 1px dashed #c8cedf; }
+.example-box .result b { color: #14142a; }
+.example-box .result-flex { display: flex; gap: 14px; align-items: flex-start; flex-wrap: wrap; margin-top: 6px; }
+.example-box .result-flex .result { flex: 1; min-width: 220px; margin-top: 0; }
+.example-box .example-img { max-width: 220px; width: 100%; height: auto; border-radius: 6px; border: 1px solid #c8cedf; background: #fff; display: block; }
+.example-box .example-img-cap { font-size: 11px; color: #8991a3; text-align: center; margin-top: 4px; }
+
+.tip {
+  background: #eef4ff; border-left: 3px solid #4a5fd6; border-radius: 0 6px 6px 0;
+  padding: 10px 14px; margin: 12px 0; font-size: 13px; color: #2a3a5a;
+}
+.tip b { color: #1a2a4a; }
+.warn {
+  background: #fff6e8; border-left: 3px solid #c9820a; border-radius: 0 6px 6px 0;
+  padding: 10px 14px; margin: 12px 0; font-size: 13px; color: #5a4110;
+}
+
+table { width: 100%; border-collapse: collapse; margin: 10px 0 18px; font-size: 12.5px; }
+th, td { text-align: left; padding: 6px 10px; border-bottom: 1px solid #dde1ee; vertical-align: top; }
+th { color: #5a6478; text-transform: uppercase; font-size: 10.5px; letter-spacing: 0.4px; }
+table.ctl td:first-child { width: 30%; font-weight: 700; color: #14142a; white-space: nowrap; }
+table.ctl.wide td:first-child { width: 24%; }
+
+.faq dt { font-weight: 700; color: #14142a; margin-top: 14px; font-size: 13.5px; }
+.faq dd { margin: 4px 0 0 0; font-size: 13px; color: #3a3f55; }
+
+footer { text-align: center; padding: 20px; font-size: 11px; color: #8991a3; }
 </style>
 </head>
 <body>
 
-<!-- ════════════════════════════════════════ SIDEBAR ═══ -->
-<nav class="sidebar" aria-label="Table of contents">
-  <div class="sidebar-logo">
-    <span class="tool-name">DeshDash</span>
-    <span class="sub">User Manual</span>
-    <span class="version-badge">ver. 1.1</span>
+<header>
+  <a class="back" href="../index.html">&larr; Back to DeshDash</a>
+  <h1>DeshDash — Help &amp; User Guide</h1>
+  <p>One tool, four ways to put India state data on a map</p>
+</header>
+
+<div id="tab-bar">
+  <button class="tab-btn active" data-tab="getting-started">Getting Started</button>
+  <button class="tab-btn" data-tab="highlights">Highlights</button>
+  <button class="tab-btn" data-tab="univariate">Univariate</button>
+  <button class="tab-btn" data-tab="bivariate">Bivariate</button>
+  <button class="tab-btn" data-tab="categorical">Categorical</button>
+  <button class="tab-btn" data-tab="annotations">Annotations</button>
+  <button class="tab-btn" data-tab="best-practices">Best Practices</button>
+  <button class="tab-btn" data-tab="reference">Reference</button>
+</div>
+
+<main>
+
+  <!-- ══════════ GETTING STARTED ══════════ -->
+  <div class="panel active" id="panel-getting-started">
+    <div class="mode-banner">DeshDash is a single, self-contained page — no install, no server, no account. Everything you make stays on your machine until you choose to export or save it.</div>
+
+    <h2>The four modes</h2>
+    <p>Every mode shares the same map, the same Data/Style/Labels/Export workflow, and the same export options — they only differ in <b>what kind of data goes on the map</b>. Pick the one that matches your data, not the other way round.</p>
+    <div class="card-grid">
+      <div class="mode-card univariate"><b>Univariate</b><span>One number per state (e.g. beneficiary count) &rarr; a single color scale.</span></div>
+      <div class="mode-card bivariate"><b>Bivariate</b><span>Two numbers per state (e.g. Coverage &times; Leakage) &rarr; one combined color grid.</span></div>
+      <div class="mode-card categorical"><b>Categorical</b><span>One category per state (e.g. dominant crop) &rarr; a color per category, not a number.</span></div>
+      <div class="mode-card annotations"><b>Annotations</b><span>Free-text notes per state, not tied to any number at all.</span></div>
+    </div>
+    <p>Switch modes any time using the colored buttons at the top — you'll always land back on the <b>Data</b> tab, since that's where you'd want to check/re-enter data for the new mode.</p>
+
+    <h2>Entering data</h2>
+    <p>Every mode's Data tab offers the same three ways to get state data in:</p>
+    <ul>
+      <li><b>Table</b> — type directly into the grid. This is also where you edit after importing.</li>
+      <li><b>Paste CSV</b> — paste two (or more) columns copied from Excel/Sheets, then click <i>Parse &amp; Load</i>. A header row is detected automatically and skipped.</li>
+      <li><b>Upload CSV</b> — upload a file with any number of columns; you then pick which column is the state name and which column(s) hold your data. Useful when your source file has extra columns you don't need.</li>
+    </ul>
+    <h3>State name matching</h3>
+    <p>DeshDash recognises full state/UT names (<code>Maharashtra</code>), common 2-letter codes (<code>MH</code>, <code>WB</code>, <code>TN</code>...), and several old/alternate spellings (<code>Orissa</code>&rarr;Odisha, <code>Uttaranchal</code>&rarr;Uttarakhand, etc.). The green/red dot next to each row tells you if that row matched a real state. Whatever you actually type is what shows on the map — e.g. type "Kerala" and it shows "Kerala"; type "Keralam" and it shows "Keralam". Matching still works either way.</p>
+
+    <h2>Two ideas that apply in every mode</h2>
+    <h3>Map labels vs. the hover tooltip</h3>
+    <p>What's <b>permanently drawn on the map</b> (state name, values, notes) is controlled separately from what you see on <b>hover</b>. Hovering any state always shows its full detail in a tooltip, no matter how much you've hidden from the permanent map — turn things off in <i>Labels tab &rarr; What to Show</i> to declutter a busy map without ever losing information.</p>
+    <h3>Everything is draggable</h3>
+    <p>The legend, every label box, the takeaway box, and every annotation note can be dragged directly on the map to reposition it. You can also hide an individual state's label entirely (Labels tab &rarr; Adjust Label Position &rarr; set that state to "Hidden") if one particular label is in the way — its data is still there on hover.</p>
+
+    <h2>Saving and exporting</h2>
+    <p>The <b>Export</b> tab has two different things — don't mix them up:</p>
+    <ul>
+      <li><b>Save/Load Project (.json)</b> — saves everything: your data, every setting, every dragged position, for every mode. Use this to come back and keep editing later.</li>
+      <li><b>Download SVG / PNG / Copy Image / Interactive HTML / Print</b> — produces the finished map for use elsewhere (a report, a slide, a webpage). These are one-way — you can't re-import them to keep editing.</li>
+    </ul>
+    <p>Map width/height (also in the Export tab) apply to whichever mode you're currently in — click <i>Generate/Refresh Map</i> after changing them.</p>
   </div>
 
-  <div class="nav-section-label">Getting Started</div>
-  <a href="#overview"     class="nav-link"><span class="nav-icon">🗺️</span> Overview</a>
-  <a href="#requirements" class="nav-link"><span class="nav-icon">⚙️</span> Requirements</a>
-  <a href="#launch"       class="nav-link"><span class="nav-icon">▶️</span> Launching</a>
-  <a href="#interface"    class="nav-link"><span class="nav-icon">🖥</span> Interface Layout</a>
+  <!-- ══════════ HIGHLIGHTS / FEATURES ══════════ -->
+  <div class="panel" id="panel-highlights">
+    <div class="mode-banner">A scan of everything DeshDash can do — use this to discover controls you might not have found yet.</div>
 
-  <div class="nav-section-label">Data Tab</div>
-  <a href="#titles" class="nav-link"><span class="nav-icon">🏷️</span> Titles &amp; Placement</a>
-  <a href="#entry"   class="nav-link"><span class="nav-icon">📝</span> Entering State Data</a>
-  <a href="#csv"     class="nav-link"><span class="nav-icon">📋</span> Paste / Upload CSV</a>
-  <a href="#multi-col" class="nav-link"><span class="nav-icon">🧮</span> Upload — Column Mapping</a>
-  <a href="#format"  class="nav-link"><span class="nav-icon">🔢</span> Value Formatting</a>
-
-  <div class="nav-section-label">Style Tab</div>
-  <a href="#scale-type" class="nav-link"><span class="nav-icon">🎨</span> Color Scale Type</a>
-  <a href="#scale-range" class="nav-link"><span class="nav-icon">📐</span> Range &amp; Midpoint</a>
-  <a href="#colors"     class="nav-link"><span class="nav-icon">🖌️</span> Borders &amp; Background</a>
-  <a href="#legend"     class="nav-link"><span class="nav-icon">🔑</span> Legend</a>
-
-  <div class="nav-section-label">Labels Tab</div>
-  <a href="#show"    class="nav-link"><span class="nav-icon">👁️</span> What to Show</a>
-  <a href="#leaders" class="nav-link"><span class="nav-icon">📌</span> Leader Lines &amp; Boxes</a>
-  <a href="#sizes"   class="nav-link"><span class="nav-icon">🔠</span> Label Sizes &amp; Colors</a>
-  <a href="#adjust"  class="nav-link"><span class="nav-icon">🎯</span> Adjust Label Position</a>
-
-  <div class="nav-section-label">Export Tab</div>
-  <a href="#dims"     class="nav-link"><span class="nav-icon">📏</span> Map Dimensions</a>
-  <a href="#download" class="nav-link"><span class="nav-icon">📁</span> Download Formats</a>
-
-  <div class="nav-section-label">Reference</div>
-  <a href="#tips"    class="nav-link"><span class="nav-icon">💡</span> Tips &amp; Tricks</a>
-  <a href="#faq"     class="nav-link"><span class="nav-icon">❓</span> Troubleshooting</a>
-  <a href="#history" class="nav-link"><span class="nav-icon">🕓</span> Version History</a>
-</nav>
-
-
-<!-- ════════════════════════════════════════ MAIN ════════ -->
-<div class="main">
-
-  <!-- Hero -->
-  <div class="hero">
-    <p class="hero-eyebrow">User Manual &nbsp;·&nbsp; Complete Guide</p>
-    <h1>DeshDash<br><span>ver. 1.1</span></h1>
-    <p class="hero-desc">Build state-wise choropleth maps of India — labels, legends, and export in one tool. Free and hosted online at <a href="https://anilyayavar.github.io/deshdash/" target="_blank" rel="noopener" style="color:#fff;text-decoration:underline">anilyayavar.github.io/deshdash</a> — just open the link, no installation or sign-up needed.</p>
-    <div class="hero-badges">
-      <span class="hero-badge featured">🗺️ Choropleth Maps</span>
-      <span class="hero-badge featured">🎨 Professional Color Palettes</span>
-      <span class="hero-badge featured">📁 SVG / PNG / HTML export</span>
-      <span class="hero-badge">Free &amp; hosted online</span>
-      <span class="hero-badge">No data uploaded</span>
-      <span class="hero-badge">Any modern browser</span>
+    <h2>Core capabilities</h2>
+    <div class="feat-grid">
+      <div class="feat-card"><b>4 modes, 1 tool</b><span>Univariate, Bivariate, Categorical, and Annotations all share one map, one workflow, and one project file — switch anytime without starting over.</span></div>
+      <div class="feat-card"><b>Map vs. tooltip separation</b><span>What's drawn permanently on the map and what shows on hover are controlled independently, in every mode — decluttering never costs you information.</span></div>
+      <div class="feat-card"><b>Three data-entry paths</b><span>Type into a table, paste CSV straight from Excel, or upload a file with column mapping — consistently available in every mode.</span></div>
+      <div class="feat-card"><b>Smart state-name matching</b><span>Full names, 2-letter codes, and historical aliases (Orissa, Uttaranchal, Pondicherry...) all resolve correctly, while your own typed spelling is what actually appears on the map.</span></div>
+      <div class="feat-card"><b>Everything is draggable</b><span>Legend, takeaway box, every label, every annotation note — click and drag directly on the map; the underlying position fields update to match.</span></div>
+      <div class="feat-card"><b>Per-state overrides</b><span>Force any individual state's label to external/inline/hidden, nudge its position with dx/dy, or (Annotations) override its fill and border color — without touching the map-wide defaults.</span></div>
+      <div class="feat-card"><b>Full project save/load</b><span>One JSON file captures data, every style setting, and every dragged position for all four modes — reopen it later and pick up exactly where you left off.</span></div>
+      <div class="feat-card"><b>Five export formats</b><span>SVG, high-res PNG, copy-to-clipboard image, a standalone interactive HTML file with working tooltips, and browser print-to-PDF.</span></div>
+      <div class="feat-card"><b>Custom color control</b><span>Every palette — sequential, diverging, bivariate corners, categorical, annotation — has a "Custom" option with its own color pickers, not just presets.</span></div>
+      <div class="feat-card"><b>Auto-contrast label text</b><span>Inline label text color can auto-switch between light/dark for readability against whatever color the state is filled with.</span></div>
+      <div class="feat-card"><b>Undo for the data table</b><span>One-step undo reverts the last table edit, paste, or clear — a safety net while you're cleaning up data.</span></div>
+      <div class="feat-card"><b>Map Takeaway callout</b><span>A single map-wide "so what" text box, separate from per-state labels, with mini-markdown formatting — available in all four modes, draggable, position-locked to a corner with fine offset.</span></div>
+      <div class="feat-card"><b>Per-mode visual theming</b><span>Each mode has its own accent color across the whole interface, so you always know which mode you're in at a glance.</span></div>
+      <div class="feat-card"><b>Annotations rich text</b><span>Notes support <code># heading</code>, <code>**bold**</code>, and <code>__underline__</code> mini-markdown, an expandable editor for long notes, and optional Group-based coloring.</span></div>
+      <div class="feat-card"><b>Collision-avoiding notes</b><span>Annotation boxes that would overlap are automatically nudged apart — vertically first, then sideways if still crowded.</span></div>
     </div>
+
+    <h2>What's unique to each mode</h2>
+    <table class="ctl">
+      <tr><td>Univariate</td><td>Sequential or diverging color scales, continuous or stepped, with full manual range/midpoint control.</td></tr>
+      <tr><td>Bivariate</td><td>A true two-variable color grid (3×3 to 5×5) instead of two separate maps, with named/independently-formatted X and Y values.</td></tr>
+      <tr><td>Categorical</td><td>Direct text categories — no binning — capped at 7 colors with an automatic "Other" overflow swatch so the legend never becomes unreadable.</td></tr>
+      <tr><td>Annotations</td><td>Free-text notes per state with three color modes (distinct / single / by Group), fully independent of any numeric scale.</td></tr>
+    </table>
   </div>
 
-  <!-- ── Content ── -->
-  <div class="content">
+  <!-- ══════════ UNIVARIATE ══════════ -->
+  <div class="panel" id="panel-univariate">
+    <div class="mode-banner">Use this when you have <b>one number per state</b> — a count, a percentage, an amount — and want a classic choropleth: darker/lighter = higher/lower.</div>
 
-    <!-- ════ OVERVIEW ════ -->
-    <div class="section" id="overview">
-      <div class="section-header">
-        <div class="section-icon icon-blue">🗺️</div>
-        <h2>Overview</h2>
-      </div>
-
-      <p>DeshDash is a free, browser-based tool for creating professional India choropleth (shaded) maps from your own state-wise data. It's hosted online at <a href="https://anilyayavar.github.io/deshdash/" target="_blank" rel="noopener">anilyayavar.github.io/deshdash</a> — just open the link, no sign-up or installation required. Everything — the map library, India's boundary data, and all rendering logic — is bundled into the page itself, so once it has loaded, it keeps working even if your internet connection drops.</p>
-
-      <div class="feature-grid">
-        <div class="feature-card">
-          <span class="fc-icon">🎨</span>
-          <div class="fc-title">Sequential &amp; Diverging Scales</div>
-          <p>Choose a one-direction gradient for values that only go up, or a two-direction gradient around a midpoint for data that can be above/below a benchmark.</p>
-        </div>
-        <div class="feature-card">
-          <span class="fc-icon">🎨</span>
-          <div class="fc-title">Trusted Color Palettes</div>
-          <p>Built-in schemes are drawn from ColorBrewer — a well-known color system designed specifically for maps, so gradients stay easy to read and colorblind-friendly out of the box.</p>
-        </div>
-        <div class="feature-card">
-          <span class="fc-icon">📋</span>
-          <div class="fc-title">Paste or Upload CSV</div>
-          <p>Load state-wise data straight from Excel or a CSV file — auto-detects headers, delimiters, and common name variants/abbreviations.</p>
-        </div>
-        <div class="feature-card">
-          <span class="fc-icon">🎯</span>
-          <div class="fc-title">Live Label Position Nudging</div>
-          <p>Fine-tune any individual state's label position directly from the panel — no code editing required.</p>
-        </div>
-        <div class="feature-card">
-          <span class="fc-icon">🔑</span>
-          <div class="fc-title">Configurable Legend</div>
-          <p>Continuous gradient or discrete color-step legend, positioned and sized to fit your layout.</p>
-        </div>
-        <div class="feature-card">
-          <span class="fc-icon">📁</span>
-          <div class="fc-title">Multiple Export Formats</div>
-          <p>Download as vector SVG, high-resolution PNG, or a standalone interactive HTML file with hover tooltips.</p>
-        </div>
-      </div>
-    </div>
-
-
-    <!-- ════ REQUIREMENTS ════ -->
-    <div class="section" id="requirements">
-      <div class="section-header">
-        <div class="section-icon icon-gray">⚙️</div>
-        <h2>Requirements</h2>
-      </div>
-
-      <div class="req-block">
-        <strong>A modern web browser</strong> — Chrome, Edge, Firefox, or Safari.<br>
-        <strong>No installation, no account, no software to download</strong> — just an internet connection to load the page the first time.
-      </div>
-
-      <p>DeshDash works on <strong>Windows</strong>, <strong>macOS</strong>, <strong>Linux</strong>, and even tablets — anywhere a browser can open a webpage. India's map boundary data and the D3.js rendering library are both embedded directly inside the page, so after it loads once, it keeps working even without an internet connection — no separate files to manage.</p>
-
-      <table class="ref-table">
-        <thead>
-          <tr><th>Component</th><th>Minimum</th><th>Notes</th></tr>
-        </thead>
-        <tbody>
-          <tr><td>Browser</td><td>Any recent version</td><td>Chrome/Edge recommended for best export quality</td></tr>
-          <tr><td>Internet</td><td>Needed to open the page</td><td>Required each time you visit the link; once loaded, all map-building happens locally in your browser with no further server calls</td></tr>
-          <tr><td>Screen size</td><td>Desktop recommended</td><td>The two-panel layout works best on a wider screen</td></tr>
-        </tbody>
+    <div class="example-box">
+      <h4>Worked example — data in</h4>
+      <table>
+        <tr><th>State</th><th>Value</th></tr>
+        <tr><td>Kerala</td><td>82</td></tr>
+        <tr><td>Tamil Nadu</td><td>76</td></tr>
+        <tr><td>Maharashtra</td><td>68</td></tr>
+        <tr><td>Odisha</td><td>54</td></tr>
+        <tr><td>Bihar</td><td>45</td></tr>
+        <tr><td>Uttar Pradesh</td><td>38</td></tr>
       </table>
-    </div>
-
-
-    <!-- ════ LAUNCHING ════ -->
-    <div class="section" id="launch">
-      <div class="section-header">
-        <div class="section-icon icon-blue">▶️</div>
-        <h2>Launching DeshDash</h2>
-      </div>
-
-      <div class="steps">
-        <div class="step">
-          <div class="step-num">1</div>
-          <div class="step-body">
-            <div class="step-title">Open the link</div>
-            <p>Visit <a href="https://anilyayavar.github.io/deshdash/" target="_blank" rel="noopener"><code>anilyayavar.github.io/deshdash</code></a> in any browser — no download, no installation, no account needed.</p>
-          </div>
-        </div>
-        <div class="step">
-          <div class="step-num">2</div>
-          <div class="step-body">
-            <div class="step-title">It loads instantly</div>
-            <p>The whole app — including India's map data — is bundled directly into that one page. Once it's loaded, all map-building happens locally in your browser — no data is sent to any server while you work. You'll still need internet to open the link again next time, unless you save a local copy (see below).</p>
-          </div>
-        </div>
-        <div class="step">
-          <div class="step-num">3</div>
-          <div class="step-body">
-            <div class="step-title">Start building</div>
-            <p>The <b>Data</b> tab is active by default — enter a title and your state-wise figures to begin.</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="callout info">
-        <span class="callout-icon">💡</span>
-        <p>Bookmark the link for quick access anytime. If you want a copy that opens without needing internet at all, use your browser's "Save As" (Ctrl+S) to save the page as a local file — the saved copy is fully self-contained and works the same way.</p>
+      <p style="margin:2px 0 0;font-size:12.5px;color:#6a6f90">Typed straight into the Table, or pasted as <code>Kerala,82</code> / <code>Tamil Nadu,76</code> ... into Paste CSV. Suffix set to <code>%</code>, 0 decimals.</p>
+      <h4>What you get — map out</h4>
+      <div class="result-flex">
+        <img class="example-img" src="examples/univariate-example.png" alt="Univariate example map: India colored on a purple sequential scale from Uttar Pradesh (lightest, 38%) to Kerala (darkest, 82%)">
+        <div class="result">One sequential color scale from lightest (38%, Uttar Pradesh) to darkest (82%, Kerala). The legend shows the 38%–82% range as a gradient bar. Hovering any state shows its exact value regardless of whether "Show value" is switched on for the map itself.</div>
       </div>
     </div>
 
+    <h3>Data tab</h3>
+    <table class="ctl wide">
+      <tr><td>State Data table</td><td>State/UT + Value columns, with a green/red dot marking whether each row's state matched. <b>+ Row</b> adds a blank row; <b>All States</b> pre-fills all 33 states/UTs so you just type values over a complete list; <b>Clear</b> empties the table; <b>Undo</b> reverts the last change; <b>Reset to Sample</b> reloads the built-in demo dataset.</td></tr>
+      <tr><td>Paste CSV</td><td>Paste <code>State,Value</code> pairs (comma or tab separated — works pasted straight from Excel), then <b>Parse &amp; Load</b>. Header row auto-detected and skipped. Numbers with grouping commas like <code>1,00,000</code> parse fine.</td></tr>
+      <tr><td>Upload CSV</td><td>Upload a .csv/.txt file, then choose the <b>State/UT column</b> and <b>Value column</b> from the dropdowns (auto-detected and pre-selected). If the file has several numeric columns, switch <b>Value column</b> anytime to redraw with a different metric — no re-upload needed.</td></tr>
+      <tr><td>Value Format</td><td><b>Prefix</b> (e.g. <code>₹</code>) and <b>Suffix</b> (e.g. <code>Cr</code>, <code>%</code>) text; <b>Decimal places</b> (Auto/0/1/2/3); <b>Thousands separator</b> checkbox. Applies everywhere the value is shown — map label, legend, tooltip.</td></tr>
+    </table>
 
-    <!-- ════ INTERFACE ════ -->
-    <div class="section" id="interface">
-      <div class="section-header">
-        <div class="section-icon icon-purple">🖥</div>
-        <h2>Interface Layout</h2>
-      </div>
+    <h3>Style tab</h3>
+    <table class="ctl wide">
+      <tr><td>Color Scale Type</td><td><b>Sequential</b> — one direction light&rarr;dark, for "more is more" data. <b>Diverging</b> — splits at a midpoint into two directions, for data that's meaningfully above/below a benchmark.</td></tr>
+      <tr><td>Sequential / Diverging Scheme</td><td>Click a swatch in the grid to pick a built-in D3 color scheme; the grid shown depends on which scale type is selected.</td></tr>
+      <tr><td>Reverse scale</td><td>Flips which end of the scheme is light vs. dark.</td></tr>
+      <tr><td>Custom gradient (Low→High)</td><td>Two color pickers to define your own sequential gradient, used when Custom is selected in the scheme grid.</td></tr>
+      <tr><td>Custom diverging (Low→Mid→High)</td><td>Three color pickers for a custom diverging gradient.</td></tr>
+      <tr><td>Scale Range — Auto min/max</td><td>On (default): scale sizes itself to your data automatically. Off: set <b>Min</b>/<b>Max</b> manually — useful for comparing several maps on the same scale, or to stop one outlier from stretching the whole range. When off + Diverging, a <b>Midpoint value</b> slider appears.</td></tr>
+      <tr><td>Steps</td><td>Continuous smooth gradient, or a fixed number of discrete color bands (4–8) — discrete bands are often easier to read at a glance in print.</td></tr>
+      <tr><td>Other Colors</td><td><b>No-data fill</b> for states with missing values; <b>Border color</b>/<b>width</b> between states; <b>Background/ocean color</b>; <b>Background opacity</b> (SVG export only — PNG export is always solid).</td></tr>
+      <tr><td>Legend</td><td><b>Show legend</b> toggle; <b>Position</b> (Center/Left/Right — sets the default drop point); <b>Width</b> as % of map. Draggable on the map regardless of the position setting.</td></tr>
+      <tr><td>Map Takeaway</td><td><b>Show takeaway box</b> toggle reveals a text box (supports <code># </code> heading, <code>**bold**</code>, <code>__underline__</code>), a corner <b>Position</b> + fine <b>dx/dy</b> offset, <b>Text size/color</b>, and <b>Box fill/border color</b>. One map-wide callout, separate from per-state labels — also draggable.</td></tr>
+    </table>
 
-      <p>The application window is divided into two main areas:</p>
+    <h3>Labels tab</h3>
+    <table class="ctl wide">
+      <tr><td>Map Labels</td><td><b>Title</b>, <b>Subtitle</b>, <b>Title placement</b> (Overlay inside the map, or Above the map with reserved space + a Top padding slider), <b>Source</b>, <b>Note</b> — the text framing around the map.</td></tr>
+      <tr><td>What to Show</td><td><b>Show state name</b>, <b>Show value</b>, <b>Abbreviate name</b> — what's drawn permanently on the map. The hover tooltip always shows full detail regardless of these.</td></tr>
+      <tr><td>External Labels</td><td>For small/crowded states that get an outside box + line: <b>Show leader lines</b>, <b>Line color</b>/<b>thickness</b>, <b>Label background box</b> toggle with its own <b>Box fill</b>, <b>Fill opacity</b>, <b>Border color</b>/<b>width</b>, <b>Corner radius</b>; <b>Name size</b>, <b>Value size</b>.</td></tr>
+      <tr><td>Inline Labels</td><td>For larger states with text drawn directly on them: <b>Name size</b>, <b>Value size</b>, <b>Auto color (contrast)</b> toggle (picks readable text color per state automatically; turning it off reveals manual <b>Name color</b>/<b>Value color</b> pickers), <b>Opacity</b>.</td></tr>
+      <tr><td>Adjust Label Position</td><td>Pick a <b>State</b>, then set its <b>Label style</b> (Auto / Always external / Always inline / Hidden — hidden states still show on hover), nudge with <b>dx/dy</b> (± buttons or type exact px), or toggle <b>No leader line (box only)</b>. Or skip the dropdown and just drag the label on the map — dx/dy update to match.</td></tr>
+    </table>
+    <p>The <b>Export</b> tab (Save/Load Project, map dimensions, downloads) is identical across all four modes — see Getting Started.</p>
+  </div>
 
-      <table class="ref-table">
-        <thead>
-          <tr><th>Area</th><th>Location</th><th>Purpose</th></tr>
-        </thead>
-        <tbody>
-          <tr><td>Control panel</td><td>Left side, dark theme</td><td>All settings, organized into four tabs</td></tr>
-          <tr><td>Tab bar</td><td>Top of panel</td><td>Switch between Data, Style, Labels, and Export</td></tr>
-          <tr><td>Generate button</td><td>Bottom of panel</td><td>Renders/refreshes the map with current settings</td></tr>
-          <tr><td>Map preview</td><td>Right side, main area</td><td>Live view of your map as it's built</td></tr>
-        </tbody>
+  <!-- ══════════ BIVARIATE ══════════ -->
+  <div class="panel" id="panel-bivariate">
+    <div class="mode-banner">Use this when you want to see <b>two numbers together</b> on one map — e.g. is high Coverage paired with high or low Leakage? — instead of flipping between two separate choropleths.</div>
+
+    <div class="example-box">
+      <h4>Worked example — data in</h4>
+      <table>
+        <tr><th>State</th><th>Value X (Coverage %)</th><th>Value Y (Delay, days)</th></tr>
+        <tr><td>Kerala</td><td>88</td><td>4</td></tr>
+        <tr><td>Maharashtra</td><td>71</td><td>9</td></tr>
+        <tr><td>Odisha</td><td>55</td><td>15</td></tr>
+        <tr><td>Bihar</td><td>42</td><td>21</td></tr>
       </table>
-
-      <h3>Tabs</h3>
-      <p>Click any of the four tabs — <strong>Data</strong>, <strong>Style</strong>, <strong>Labels</strong>, or <strong>Export</strong> — to switch sections. Most controls apply live to the map preview as you adjust them; a few (like map size) need a click of <strong>Generate / Refresh Map</strong>.</p>
+      <p style="margin:2px 0 0;font-size:12.5px;color:#6a6f90">Pasted as 3-column CSV: <code>Kerala,88,4</code> ... into Paste CSV. Value X named "Coverage" (suffix <code>%</code>), Value Y named "Delay" (suffix <code> days</code>).</p>
+      <h4>What you get — map out</h4>
+      <div class="result-flex">
+        <img class="example-img" src="examples/bivariate-example.png" alt="Bivariate example map: Kerala, Maharashtra, Odisha, and Bihar each colored a different shade from the Coverage x Delay grid">
+        <div class="result">A 3×3 grid maps each state into one of nine colors based on its X and Y rank together. Kerala (high coverage, low delay) lands in the "good corner." Bihar (low coverage, high delay) lands in the opposite corner — a visually distinct color, not just a darker shade. Maharashtra and Odisha, being high on one axis but middling on the other, land in different in-between cells. Hovering any state always shows both exact numbers.</div>
+      </div>
     </div>
 
+    <h2>How to read the grid</h2>
+    <p>Each state's color comes from a small grid, not a single scale. One axis (X) is your first variable, the other (Y) is your second. A state lands in a grid cell based on where it ranks on <i>both</i> — so the "high-high" corner and "low-low" corner are the two most different-looking colors, and a state that's high on one but low on the other lands in a third, distinct corner.</p>
 
-    <!-- ════ TITLES ════ -->
-    <div class="section" id="titles">
-      <div class="section-header">
-        <div class="section-icon icon-blue">🏷️</div>
-        <h2>Titles &amp; Placement</h2>
-      </div>
+    <h3>Data tab</h3>
+    <table class="ctl wide">
+      <tr><td>State Data table</td><td>State/UT + <b>Value X</b> + <b>Value Y</b> columns (the table gains the second column automatically in this mode). Same +Row/All States/Clear/Undo/Reset to Sample buttons as Univariate. If you arrive here with no Y data yet, sample Y numbers auto-fill so the map isn't blank — replace them with your own.</td></tr>
+      <tr><td>Paste CSV</td><td>3-column paste: <code>State,X,Y</code>. Header row auto-detected.</td></tr>
+      <tr><td>Upload CSV</td><td>Pick <b>State/UT column</b>, <b>Value column (X — first variable)</b>, and <b>Value column (Y — second variable)</b> from three dropdowns.</td></tr>
+      <tr><td>Value Format</td><td>Two independent named blocks since X and Y are usually different units: <b>Value X</b> (name field, e.g. "Literacy", plus its own Prefix/Suffix/Decimal places) and <b>Value Y</b> (e.g. "GSDP Growth", same set of fields). <b>Label separator</b> controls how X and Y join when both are shown on the map: New line (stacked), <code>/</code>, <code>,</code>, or <code>|</code>. Thousands separator checkbox is shared.</td></tr>
+    </table>
 
-      <table class="ref-table">
-        <thead>
-          <tr><th>Control</th><th>What it does</th></tr>
-        </thead>
-        <tbody>
-          <tr><td>Title / Subtitle</td><td>Main heading and a smaller line beneath it (e.g. a financial year). Leave subtitle blank to omit it.</td></tr>
-          <tr><td>Source / Note</td><td>Small print at the bottom-left/right of the map — typically a data source citation and a units note (e.g. "Figures in ₹ Crore").</td></tr>
-          <tr><td>Title placement</td><td>See below.</td></tr>
-        </tbody>
+    <h3>Style tab</h3>
+    <table class="ctl wide">
+      <tr><td>Bivariate Grid &amp; Colors</td><td><b>Grid size</b> (3×3/4×4/5×5 — how many ranked buckets each variable is split into; more cells means finer distinctions but a busier legend). <b>Palette preset</b>: Stevens Pink-Blue (classic, well-tested bivariate scheme), Teal-Rose, Blue-Orange, or Custom. Four corner pickers — <b>Low X/Low Y</b> (base), <b>High X/Low Y</b>, <b>Low X/High Y</b>, <b>High X/High Y</b> (both high) — a preset fills these; edit any of them afterward to go Custom. <b>Reset to preset default</b> restores the selected preset's original corners.</td></tr>
+      <tr><td>Other Colors / Legend / Map Takeaway</td><td>Same controls as Univariate (see there). <b>Color Scale Type</b> and <b>Scale Range</b> sections are hidden in this mode — Bivariate uses its own grid instead of a single scale.</td></tr>
+    </table>
+
+    <h3>Labels tab</h3>
+    <table class="ctl wide">
+      <tr><td>Map Labels</td><td>Same Title/Subtitle/Source/Note controls as Univariate.</td></tr>
+      <tr><td>What to Show</td><td><b>Show Value X</b> / <b>Show Value Y</b> — two independent toggles (each labeled with your X/Y name), <b>both off by default</b> since two value lines per state gets cluttered fast; state color + name carry the pattern, hover for exact numbers. <b>Abbreviate name</b> also available.</td></tr>
+      <tr><td>External Labels / Inline Labels / Adjust Label Position</td><td>Same mechanics as Univariate — see there.</td></tr>
+    </table>
+  </div>
+
+  <!-- ══════════ CATEGORICAL ══════════ -->
+  <div class="panel" id="panel-categorical">
+    <div class="mode-banner">Use this when each state belongs to a <b>named group</b>, not a number — dominant crop, scheme type, region classification, risk tier you've already decided on. Nothing here gets calculated or binned; you supply the category directly.</div>
+
+    <div class="example-box">
+      <h4>Worked example — data in</h4>
+      <table>
+        <tr><th>State</th><th>Category</th></tr>
+        <tr><td>Punjab</td><td>Wheat</td></tr>
+        <tr><td>West Bengal</td><td>Rice</td></tr>
+        <tr><td>Kerala</td><td>Rice</td></tr>
+        <tr><td>Rajasthan</td><td>Millets</td></tr>
+        <tr><td>Assam</td><td>Tea</td></tr>
       </table>
-
-      <div class="card">
-        <div class="card-title">🖼️ Overlay (inside map)</div>
-        <p>The title floats inside the natural blank space above Jammu &amp; Kashmir, saving vertical space. Best for a short title with no subtitle.</p>
-      </div>
-      <div class="card">
-        <div class="card-title">📐 Above map (reserved space)</div>
-        <p>A dedicated band is added above the map exclusively for the title/subtitle, so nothing overlaps even with longer text. Use the Top padding slider to control how much space is reserved.</p>
-      </div>
-
-      <div class="callout tip">
-        <span class="callout-icon">✅</span>
-        <p>If your title and subtitle combination looks cramped, switch to <strong>Above map</strong> placement and increase the padding slider.</p>
+      <p style="margin:2px 0 0;font-size:12.5px;color:#6a6f90">Typed as free text into the Category column, or pasted as <code>Punjab,Wheat</code> ... into Paste CSV — no number parsing involved.</p>
+      <h4>What you get — map out</h4>
+      <div class="result-flex">
+        <img class="example-img" src="examples/categorical-example.png" alt="Categorical example map: Punjab, West Bengal, Kerala, Rajasthan, and Assam each colored by their crop category, with West Bengal and Kerala sharing the Rice color">
+        <div class="result">Every distinct category gets its own solid color: Wheat one color, Rice another (so West Bengal and Kerala match, since they share a category), Millets and Tea their own. The legend lists each category with its swatch. If a 6th category appeared beyond 7 distinct ones, it would join the gray "Other" swatch instead of getting a new color.</div>
       </div>
     </div>
 
+    <h3>Data tab</h3>
+    <table class="ctl wide">
+      <tr><td>State Data table</td><td>State/UT + a free-text <b>Category</b> column (not numeric) — type the category name directly for each state. Same +Row/All States/Clear/Undo/Reset to Sample buttons as Univariate. If you switch into this mode with leftover numbers in the column, generic sample category text auto-fills so nothing breaks — replace it with your real categories.</td></tr>
+      <tr><td>Paste CSV</td><td><code>State,Category text</code> pairs. Header-row detection checks whether the first column matches a real state name (not whether the value column is numeric, since category text never is).</td></tr>
+      <tr><td>Upload CSV</td><td>Pick <b>State/UT column</b> and <b>Category column</b>.</td></tr>
+      <tr><td>Value Format</td><td>Hidden in this mode — prefix/suffix/decimals/thousands-separator don't apply to text.</td></tr>
+    </table>
 
-    <!-- ════ ENTRY ════ -->
-    <div class="section" id="entry">
-      <div class="section-header">
-        <div class="section-icon icon-green">📝</div>
-        <h2>Entering State Data</h2>
-      </div>
+    <h3>Style tab</h3>
+    <table class="ctl wide">
+      <tr><td>Categorical Colors</td><td><b>Palette</b> (Set2 / Dark2 / Paired / Pastel2 — ColorBrewer qualitative sets chosen so adjacent colors stay visually distinct).</td></tr>
+      <tr><td>7-category cap</td><td>Up to 7 distinct categories get their own color; anything beyond that automatically shares one gray <b>"Other"</b> swatch in the legend, so it never becomes an unreadable wall of tiny colors. If you're hitting the cap often, consider merging minor categories yourself.</td></tr>
+      <tr><td>Other Colors / Legend / Map Takeaway</td><td>Same controls as Univariate. <b>Color Scale Type</b> and <b>Scale Range</b> are hidden — there's no numeric scale to configure.</td></tr>
+    </table>
 
-      <p>The data table has three columns: a status dot, the State/UT name, and its numeric value.</p>
+    <h3>Labels tab</h3>
+    <table class="ctl wide">
+      <tr><td>What to Show</td><td>Same as Univariate, except the "Show value" toggle is relabeled <b>Show category</b>.</td></tr>
+      <tr><td>Map Labels / External Labels / Inline Labels / Adjust Label Position</td><td>Identical mechanics to Univariate — the state simply displays its category text instead of a number.</td></tr>
+    </table>
+  </div>
 
-      <table class="ref-table">
-        <thead>
-          <tr><th>Status dot</th><th>Meaning</th></tr>
-        </thead>
-        <tbody>
-          <tr><td>🟢 Green</td><td>The state name was recognized and matched to the map</td></tr>
-          <tr><td>🔴 Red</td><td>The name wasn't recognized — check spelling or try a standard abbreviation</td></tr>
-          <tr><td>🟠 Amber</td><td>Row is empty or incomplete</td></tr>
-        </tbody>
+  <!-- ══════════ ANNOTATIONS ══════════ -->
+  <div class="panel" id="panel-annotations">
+    <div class="mode-banner">Use this for <b>free-text notes on the map</b> — key findings, context, callouts — with no number or category driving anything. Think of it as sticky notes pinned to states.</div>
+
+    <div class="example-box">
+      <h4>Worked example — data in</h4>
+      <table>
+        <tr><th>State</th><th>Group</th><th>Note</th></tr>
+        <tr><td>Kerala</td><td>On track</td><td># Strong performer\nHigh coverage, low delay this quarter.</td></tr>
+        <tr><td>Bihar</td><td>Needs attention</td><td>Coverage improved but still **below target**.</td></tr>
+        <tr><td>Assam</td><td>Needs attention</td><td>Field visit planned for next month.</td></tr>
       </table>
-
-      <p>Use <strong>+ Add Row</strong> to add more states, or the <strong>×</strong> button on a row to delete it. State names typed here offer autocomplete suggestions as you type.</p>
-    </div>
-
-
-    <!-- ════ CSV ════ -->
-    <div class="section" id="csv">
-      <div class="section-header">
-        <div class="section-icon icon-green">📋</div>
-        <h2>Paste / Upload CSV</h2>
-      </div>
-
-      <p>For larger datasets, switch from the <strong>Table</strong> view to <strong>Paste CSV</strong> or <strong>Upload CSV</strong> using the buttons above the data grid.</p>
-
-      <div class="feature-grid">
-        <div class="feature-card">
-          <span class="fc-icon">📋</span>
-          <div class="fc-title">Paste CSV</div>
-          <p>Paste two columns of data (state name, value) directly into the text box, then click Parse &amp; Load. Supports comma- or tab-separated data copied straight from Excel.</p>
-        </div>
-        <div class="feature-card">
-          <span class="fc-icon">📁</span>
-          <div class="fc-title">Upload CSV</div>
-          <p>Choose any <code>.csv</code> or <code>.txt</code> file — works for a simple two-column file or a wide sheet with several columns. See <a href="#multi-col">Upload CSV — Column Mapping</a> below for the full workflow.</p>
-        </div>
-      </div>
-
-      <p>Both methods auto-detect whether the first line is a header row and skip it if so. State names can be full names, standard abbreviations (e.g. <code>MP</code>, <code>WB</code>, <code>UP</code>), or common alternate spellings (e.g. <code>Odisha</code>/<code>Orissa</code>, <code>Uttarakhand</code>/<code>Uttaranchal</code>, <code>Puducherry</code>/<code>Pondicherry</code>, <code>Keralam</code>/<code>Kerala</code>).</p>
-
-      <div class="callout warn">
-        <span class="callout-icon">⚠️</span>
-        <p>If a state doesn't match, double-check for extra spaces, unusual punctuation, or a name DeshDash doesn't recognize yet. Standard 2-letter state codes and most common name variants are supported.</p>
+      <p style="margin:2px 0 0;font-size:12.5px;color:#6a6f90">Typed into the Table (or pasted as <code>Kerala,Note text</code> with <code>\n</code> for line breaks). <code># </code> makes a bold heading line, <code>**below target**</code> renders bold.</p>
+      <h4>What you get — map out</h4>
+      <div class="result-flex">
+        <img class="example-img" src="examples/annotations-example.png" alt="Annotations example map: Kerala, Bihar, and Assam each with a draggable note box showing their text, with the heading and bold text rendered">
+        <div class="result">Each state with a note gets a draggable text box near its centroid, with its heading and body rendered per the mini-markdown above — shown here with the default "Distinct per state" coloring, so Kerala, Bihar, and Assam each get their own color. Overlapping boxes (Bihar and Assam are neighbors) auto-shift apart so neither is hidden behind the other. If Bihar and Assam were both put in a "Needs attention" Group and Annotation Fill switched to "Categorical (by Group)," they'd share one color instead, with a group legend on the map.</div>
       </div>
     </div>
 
+    <h3>Data tab</h3>
+    <table class="ctl wide">
+      <tr><td>Annotations Data table</td><td>Replaces "State Data" entirely in this mode. Columns: State/UT, <b>Group</b> (optional — used by the Categorical-by-Group color mode below), <b>Note</b> (supports <code>**bold**</code>, <code>__underline__</code>, <code># heading</code>). Click the small <b>&#10530;</b> button on any row to edit its note in a larger popup editor. <b>+ Row</b>, <b>Clear</b>, <b>Reset to Sample</b> buttons (no Undo in this table).</td></tr>
+      <tr><td>Paste CSV</td><td><code>State,Note text</code> pairs. Type a literal <code>\n</code> inside a cell for a line break within a note. Header row auto-detected. <b>Group is not set by import</b> — add it in the Table view afterward if needed.</td></tr>
+      <tr><td>Upload CSV</td><td>Pick <b>State/UT column</b> and <b>Note text column</b>.</td></tr>
+    </table>
 
-    <!-- ════ MULTI-COLUMN ════ -->
-    <div class="section" id="multi-col">
-      <div class="section-header">
-        <div class="section-icon icon-green">🧮</div>
-        <h2>Upload CSV — Column Mapping</h2>
-      </div>
+    <h3>Style tab</h3>
+    <table class="ctl wide">
+      <tr><td>Annotation Fill — Color mode</td><td><b>Distinct per state</b> (default): every annotated state gets its own palette color. <b>Single color</b>: every annotated state shares one flat color you pick — use when the color itself carries no meaning. <b>Categorical (by Group)</b>: colors follow the Group column, with a <b>Show group legend on map</b> toggle.</td></tr>
+      <tr><td>Palette</td><td>Set2/Dark2/Paired/Pastel2 (ColorBrewer qualitative), used in Distinct and Categorical modes.</td></tr>
+      <tr><td>No-data fill</td><td>Fill color for states with no note.</td></tr>
+      <tr><td>Legend</td><td>Hidden in this mode — the "Show group legend on map" toggle above replaces it when using Categorical-by-Group coloring.</td></tr>
+      <tr><td>Other Colors / Map Takeaway</td><td>Same controls as every other mode.</td></tr>
+    </table>
 
-      <p>Click <strong>Upload CSV</strong> above the data grid to load a file. This works for any layout — a simple two-column file (state, value), or a wider sheet with extra columns, e.g. state name, population, growth rate, and literacy rate all in the same file.</p>
+    <h3>Labels tab</h3>
+    <table class="ctl wide">
+      <tr><td>Annotation Text Style</td><td><b>Show note text on map</b> (turn off for a clean colored map that still shows full text on hover), <b>Show state name heading</b>, <b>State name size</b>, <b>Note text size</b>, <b>Line spacing</b>, <b>Wrap width</b> (characters per line — keep it tight so long notes don't overflow their box), <b>Text color</b>, <b>Text matches state color</b> checkbox, <b>Text opacity</b>.</td></tr>
+      <tr><td>Annotation Leader Lines</td><td><b>Show leader lines</b>, <b>Line color</b>, <b>Line thickness</b>.</td></tr>
+      <tr><td>Annotation Label Box</td><td><b>Label background box</b> toggle, <b>Box fill color</b>, <b>Fill opacity</b>, <b>Border color</b> (fallback, used only where per-state border-matches-color is off), <b>Border width</b>, <b>Padding</b>, <b>Corner radius</b>.</td></tr>
+      <tr><td>Adjust Annotation Position &amp; Color</td><td>Pick a <b>State</b>, nudge with <b>dx/dy</b> or drag its note box directly on the map (overlapping boxes auto-shift apart — vertically, then sideways). <b>No leader line (box only)</b>; <b>Hide this state's note on map</b> (still shows on hover); <b>State fill (override)</b> color + Reset button; <b>Label border matches state color</b> checkbox, with a <b>Custom border color</b> picker when unchecked.</td></tr>
+      <tr><td>Hidden in this mode</td><td>What to Show / External Labels / Inline Labels / Adjust Label Position (the numeric-mode versions) don't apply here — replaced entirely by the four sections above.</td></tr>
+    </table>
+    <div class="tip"><b>Formatting inside a note:</b> <code># Heading text</code> at the start of a line for a bold heading, <code>**bold**</code> for inline bold, <code>__underline__</code> for inline underline, <code>\n</code> in pasted/uploaded text for a line break.</div>
+  </div>
 
-      <div class="steps">
-        <div class="step">
-          <div class="step-num">1</div>
-          <div class="step-body">
-            <div class="step-title">Upload the file</div>
-            <p>Choose any <code>.csv</code> file with two or more columns. DeshDash reads the header row and every column's data.</p>
-          </div>
-        </div>
-        <div class="step">
-          <div class="step-num">2</div>
-          <div class="step-body">
-            <div class="step-title">Check the auto-detected columns</div>
-            <p>Two dropdowns appear — <strong>State / UT column</strong> and <strong>Value column</strong> — populated from your file's actual headers. DeshDash guesses both automatically (by matching column values against known state names, and picking the first mostly-numeric column), but you can change either dropdown if the guess is wrong.</p>
-          </div>
-        </div>
-        <div class="step">
-          <div class="step-num">3</div>
-          <div class="step-body">
-            <div class="step-title">Click Load Selected Columns</div>
-            <p>The standard data table fills in from your chosen pair of columns, exactly as if you'd typed or pasted it directly.</p>
-          </div>
-        </div>
-      </div>
+  <!-- ══════════ BEST PRACTICES ══════════ -->
+  <div class="panel" id="panel-best-practices">
+    <div class="mode-banner">Practical habits that make maps easier to build, read, and trust — learned from how the tool is actually used.</div>
 
-      <div class="callout tip">
-        <span class="callout-icon">✅</span>
-        <p><strong>Multiple maps from one file:</strong> if your file has several numeric columns (e.g. population <em>and</em> literacy rate), just switch the <strong>Value column</strong> dropdown to a different one at any time — the table reloads and the map redraws with the new metric immediately. No need to re-upload the file to compare different measures from the same dataset.</p>
-      </div>
-    </div>
+    <h2>Working with data</h2>
+    <ul class="bp-list">
+      <li><b>Start from Reset to Sample</b> before pasting real data — it shows you the exact column shape each mode expects, so your paste lands correctly the first time.</li>
+      <li><b>Always check the match-info dots after import.</b> A red/unmatched dot means that state silently has no data on the map — it's easy to miss if you only glance at the map, not the table.</li>
+      <li><b>Watch for duplicate spellings resolving to one state</b> (e.g. "Kerala" and "Keralam" in two rows) — only the last one entered is kept; the map won't show an error, it'll just look like one row's data went missing.</li>
+      <li><b>Pick the mode to match your data's shape</b>, not the chart you had in mind — one number → Univariate, two numbers → Bivariate, a label → Categorical, prose → Annotations. Forcing the wrong mode (e.g. cramming two numbers into Categorical text) throws away what that mode is built for.</li>
+    </ul>
 
+    <h2>Choosing scales and colors</h2>
+    <ul class="bp-list">
+      <li><b>Use Diverging only when there's a real midpoint that matters</b> — a benchmark, a target, a zero line. If "more is simply more," Sequential is easier for readers to interpret at a glance.</li>
+      <li><b>Turn off Auto min/max when comparing several maps side by side</b>, and set the same manual Min/Max on all of them — otherwise identical colors on two maps can mean different values.</li>
+      <li><b>Keep the Bivariate grid at 3×3 unless you specifically need finer distinctions</b> — 4×4 and 5×5 pack more nuance in but the legend gets harder to read at a glance, especially in a printed report.</li>
+      <li><b>In Categorical, stay at or under 7 real categories</b>, and merge minor ones yourself before you hit the cap — that way you control which categories get grouped, instead of the automatic "Other" bucket deciding for you.</li>
+    </ul>
 
-    <!-- ════ FORMAT ════ -->
-    <div class="section" id="format">
-      <div class="section-header">
-        <div class="section-icon icon-green">🔢</div>
-        <h2>Value Formatting</h2>
-      </div>
+    <h2>Decluttering and presenting</h2>
+    <ul class="bp-list">
+      <li><b>Turn off on-map value/note display for presentation-ready maps</b> (What to Show, or Show note text on map) and let the hover tooltip carry the detail — cleaner for screenshots and slides.</li>
+      <li><b>But remember static exports (PNG/SVG/Print) can't show hover tooltips.</b> If you've hidden values or notes from the map for cleanliness, make sure the number/text you need is actually visible in whatever export you plan to share — use <b>Interactive HTML</b> export instead if the recipient needs to hover for detail in a standalone file.</li>
+      <li><b>Drag first, fine-tune with dx/dy second.</b> Dragging a label or note roughly into place is faster than guessing pixel offsets — use the dx/dy fields afterward only for small precision nudges.</li>
+      <li><b>For Annotations, keep notes short and rely on Wrap width</b> rather than writing long paragraphs — a note that overflows its box looks worse than a short, clear one.</li>
+    </ul>
 
-      <table class="ref-table">
-        <thead>
-          <tr><th>Control</th><th>What it does</th></tr>
-        </thead>
-        <tbody>
-          <tr><td>Prefix / Suffix</td><td>Text shown before/after every number — e.g. prefix <code>₹</code> and suffix <code>Cr</code> renders as <code>₹450 Cr</code></td></tr>
-          <tr><td>Decimal places</td><td><strong>Auto</strong> detects the decimal precision already present in your data (up to 3 places). Can also be fixed to 0–3 places manually.</td></tr>
-          <tr><td>Use thousand separators</td><td>Adds commas to large numbers (e.g. <code>12,45,000</code>)</td></tr>
-        </tbody>
-      </table>
-    </div>
+    <h2>Protecting your work</h2>
+    <ul class="bp-list">
+      <li><b>Save a Project file before experimenting</b> with a setting you're unsure about, and again once you're happy with the result — Undo only covers the data table, not styling changes.</li>
+      <li><b>Use consistent Prefix/Suffix/decimal formatting across a series of maps</b> destined for the same report, so all the figures read the same way to your audience.</li>
+    </ul>
+  </div>
 
+  <!-- ══════════ REFERENCE ══════════ -->
+  <div class="panel" id="panel-reference">
+    <h2>Troubleshooting / FAQ</h2>
+    <dl class="faq">
+      <dt>A state isn't matching (red dot / greyed out on the map)</dt>
+      <dd>Check the spelling against the state's actual name, or use a recognized 2-letter code. Old names like "Orissa" and "Uttaranchal" work too, but genuinely unusual spellings or typos won't auto-match — fix the text in the State/UT column.</dd>
 
-    <!-- ════ SCALE TYPE ════ -->
-    <div class="section" id="scale-type">
-      <div class="section-header">
-        <div class="section-icon icon-purple">🎨</div>
-        <h2>Color Scale Type</h2>
-      </div>
+      <dt>Two rows show the same state twice</dt>
+      <dd>Two spellings of the same state (e.g. "Kerala" and "Keralam") can both resolve to one state internally — only the last one you entered is kept, the other is silently dropped. Check for accidental duplicate rows if a state's value looks wrong.</dd>
 
-      <div class="card">
-        <div class="card-title">Sequential</div>
-        <p>A single-direction gradient (light → dark), best for data that only goes one way — e.g. population, income.</p>
-      </div>
-      <div class="card">
-        <div class="card-title">Diverging</div>
-        <p>A two-direction gradient around a midpoint (e.g. red → white → blue), best for data that can be positive or negative, or above/below a benchmark — e.g. growth rate vs. national average.</p>
-      </div>
+      <dt>The map looks too cluttered</dt>
+      <dd>Turn off name/value/note display for individual states (see "Two ideas that apply in every mode" under Getting Started), or reduce what's shown by default in the Labels tab — you never lose the data, it's always on hover.</dd>
 
-      <p>Each type offers a grid of built-in color schemes — click any swatch to select — plus a <strong>Custom</strong> option to pick your own gradient colors.</p>
+      <dt>The legend is covering part of the map</dt>
+      <dd>Drag it. Every legend in every mode can be repositioned by clicking and dragging it directly.</dd>
 
-      <div class="callout info">
-        <span class="callout-icon">💡</span>
-        <p><strong>Reverse scale</strong> flips the direction of whichever scheme is selected — useful when a "darker = worse" scheme needs to become "darker = better" for your dataset.</p>
-      </div>
-    </div>
+      <dt>Bivariate colors don't look right after changing the grid size</dt>
+      <dd>Click <i>Reset to preset default</i> in Style tab &rarr; Bivariate Grid &amp; Colors, or re-pick a palette preset — hand-edited corner colors stay as "Custom" until you do.</dd>
 
+      <dt>I switched modes and my data changed</dt>
+      <dd>Univariate, Bivariate, and Categorical share one underlying data table (since they're all "one row per state"). Switching between them adapts that table's format automatically, but if you had unrelated data in there from a different mode, re-check it after switching. Annotations has its own separate table, untouched by the others.</dd>
+    </dl>
 
-    <!-- ════ SCALE RANGE ════ -->
-    <div class="section" id="scale-range">
-      <div class="section-header">
-        <div class="section-icon icon-purple">📐</div>
-        <h2>Scale Range &amp; Midpoint</h2>
-      </div>
+    <h2>Export formats explained</h2>
+    <table>
+      <tr><th>Format</th><th>Best for</th></tr>
+      <tr><td>SVG</td><td>Further editing in Illustrator/Inkscape; infinitely scalable, small file size.</td></tr>
+      <tr><td>PNG (2&times;)</td><td>Dropping straight into a report or slide deck; high-resolution raster.</td></tr>
+      <tr><td>Copy Image to Clipboard</td><td>Pasting directly into Word/PowerPoint/chat without saving a file first.</td></tr>
+      <tr><td>Interactive HTML</td><td>Sharing a standalone file where hovering states still shows the tooltip, viewable in any browser, no app needed.</td></tr>
+      <tr><td>Print / Save as PDF</td><td>Using your browser's own print dialog for a quick PDF.</td></tr>
+    </table>
 
-      <table class="ref-table">
-        <thead>
-          <tr><th>Control</th><th>What it does</th></tr>
-        </thead>
-        <tbody>
-          <tr><td>Auto min/max</td><td>When checked, the color scale automatically stretches from your data's lowest to highest value. Uncheck to set fixed Min/Max values manually — useful for comparing multiple maps on the same scale.</td></tr>
-          <tr><td>Midpoint slider <em>(Diverging only, manual range)</em></td><td>Appears below Min/Max only when Auto min/max is unchecked and the scale type is Diverging. Drag it to set where the color scale "splits" between the two diverging colors — bounded by your current Min/Max. Defaults to the midpoint of your range and stays fixed even if you later adjust Min/Max, unless it falls outside the new range.</td></tr>
-          <tr><td>Steps</td><td><code>0</code> gives a smooth continuous gradient. Any other number (4–8) buckets the data into that many discrete color bands — often clearer for printed reports.</td></tr>
-        </tbody>
-      </table>
-    </div>
+    <h2>What's new in this build</h2>
+    <p>This unified DeshDash combines what used to be two separate tools (DeshDash for choropleths, LabelDash for free-text notes) into one app with four switchable modes, plus two entirely new modes (Bivariate and Categorical) that didn't exist before. Your data, once entered, carries between modes wherever it makes sense — you're not starting over each time you switch.</p>
 
+    <div class="tip"><b>Tip:</b> Save a project file before experimenting with a setting you're not sure about — it's the fastest way back to where you were.</div>
+  </div>
 
-    <!-- ════ COLORS ════ -->
-    <div class="section" id="colors">
-      <div class="section-header">
-        <div class="section-icon icon-purple">🖌️</div>
-        <h2>Borders &amp; Background</h2>
-      </div>
+</main>
 
-      <table class="ref-table">
-        <thead>
-          <tr><th>Control</th><th>What it does</th></tr>
-        </thead>
-        <tbody>
-          <tr><td>No-data fill</td><td>Color used for states with no value entered</td></tr>
-          <tr><td>Border color / width</td><td>State outline color and thickness</td></tr>
-          <tr><td>Background / ocean color</td><td>Fills the space outside India's boundary within the canvas</td></tr>
-          <tr><td>Background opacity</td><td>Only affects the SVG export — PNG exports always render a solid background</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-
-    <!-- ════ LEGEND ════ -->
-    <div class="section" id="legend">
-      <div class="section-header">
-        <div class="section-icon icon-purple">🔑</div>
-        <h2>Legend</h2>
-      </div>
-
-      <p><strong>Show legend</strong> toggles the color-key strip below the map. <strong>Position</strong> (left/center/right) and <strong>Width</strong> (as a % of map width) control its placement and size.</p>
-    </div>
-
-
-    <!-- ════ SHOW ════ -->
-    <div class="section" id="show">
-      <div class="section-header">
-        <div class="section-icon icon-blue">👁️</div>
-        <h2>What to Show</h2>
-      </div>
-
-      <p><strong>Show state name</strong>, <strong>Show value</strong>, and <strong>Abbreviate name</strong> (uses 2-letter codes instead of full names) control what's printed on/near each state.</p>
-    </div>
-
-
-    <!-- ════ LEADERS ════ -->
-    <div class="section" id="leaders">
-      <div class="section-header">
-        <div class="section-icon icon-blue">📌</div>
-        <h2>Leader Lines &amp; Boxes</h2>
-      </div>
-
-      <p>Small or geographically awkward states/UTs (Sikkim, Goa, Chandigarh, Andaman &amp; Nicobar, etc.) can't fit readable labels inside their own boundary. DeshDash draws a thin <strong>leader line</strong> from the state's center to a floating label box placed in open space nearby.</p>
-
-      <table class="ref-table">
-        <thead>
-          <tr><th>Control</th><th>What it does</th></tr>
-        </thead>
-        <tbody>
-          <tr><td>Show leader lines</td><td>Master toggle — if off, these states fall back to a plain inline label (may look cramped for very small states)</td></tr>
-          <tr><td>Line color / thickness</td><td>Styling for the connector line and its anchor dot</td></tr>
-          <tr><td>Label background box</td><td>Toggles the rounded box behind external labels, improving legibility over the colored map</td></tr>
-          <tr><td>Box fill color / opacity</td><td>Background color and transparency of the label box</td></tr>
-          <tr><td>Border color / width</td><td>Outline of the label box — set width to 0 for a borderless box</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-
-    <!-- ════ SIZES ════ -->
-    <div class="section" id="sizes">
-      <div class="section-header">
-        <div class="section-icon icon-blue">🔠</div>
-        <h2>Label Sizes &amp; Colors</h2>
-      </div>
-
-      <p>Two independent size groups exist because they're read against different backgrounds:</p>
-
-      <div class="card">
-        <div class="card-title">External Labels</div>
-        <p>Text inside leader-line boxes — small/NE states, UTs.</p>
-      </div>
-      <div class="card">
-        <div class="card-title">Inline Labels</div>
-        <p>Text drawn directly inside large states, e.g. Rajasthan, Madhya Pradesh.</p>
-      </div>
-
-      <p>Each group has separate <strong>Name size</strong> and <strong>Value size</strong> sliders. For inline labels, <strong>Auto color (contrast)</strong> automatically picks black or white text depending on how dark the underlying fill color is — turn it off to set manual name/value colors and a fixed opacity instead.</p>
-    </div>
-
-
-    <!-- ════ ADJUST ════ -->
-    <div class="section" id="adjust">
-      <div class="section-header">
-        <div class="section-icon icon-blue">🎯</div>
-        <h2>Adjust Label Position</h2>
-      </div>
-
-      <p>Leader-line labels have sensible default positions, but any map layout may need fine-tuning for specific states — e.g. two neighboring labels overlapping. This panel lets you nudge any individual state's label without touching code:</p>
-
-      <div class="steps">
-        <div class="step">
-          <div class="step-num">1</div>
-          <div class="step-body">
-            <div class="step-title">Pick a state</div>
-            <p>Choose from the State dropdown.</p>
-          </div>
-        </div>
-        <div class="step">
-          <div class="step-num">2</div>
-          <div class="step-body">
-            <div class="step-title">Nudge dx / dy</div>
-            <p><strong>dx</strong> (horizontal: negative = left, positive = right) and <strong>dy</strong> (vertical: negative = up, positive = down) — use the +/− buttons or type a value directly.</p>
-          </div>
-        </div>
-        <div class="step">
-          <div class="step-num">3</div>
-          <div class="step-body">
-            <div class="step-title">Optionally remove the leader line</div>
-            <p>Check <strong>No leader line (box only)</strong> for a label that floats without a connecting line — useful for tightly-packed island groups like Lakshadweep.</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="callout warn">
-        <span class="callout-icon">⚠️</span>
-        <p>Position adjustments made here are session-only — they reset if you reload the page. If you find good values, keep a note of them for future sessions.</p>
-      </div>
-    </div>
-
-
-    <!-- ════ DIMS ════ -->
-    <div class="section" id="dims">
-      <div class="section-header">
-        <div class="section-icon icon-orange">📏</div>
-        <h2>Map Dimensions</h2>
-      </div>
-
-      <p>Set the pixel <strong>Width</strong> and <strong>Height</strong> of the exported map. Click <strong>Generate / Refresh Map</strong> after changing these to apply the new size.</p>
-    </div>
-
-
-    <!-- ════ DOWNLOAD ════ -->
-    <div class="section" id="download">
-      <div class="section-header">
-        <div class="section-icon icon-orange">📁</div>
-        <h2>Download Formats</h2>
-      </div>
-
-      <table class="ref-table">
-        <thead>
-          <tr><th>Format</th><th>Best for</th></tr>
-        </thead>
-        <tbody>
-          <tr><td>SVG</td><td>Vector format — infinitely scalable and editable in Illustrator/Inkscape. Best for further design work.</td></tr>
-          <tr><td>PNG (2×)</td><td>High-resolution raster image — ideal for pasting into Word/PowerPoint reports or slides.</td></tr>
-          <tr><td>Interactive HTML</td><td>A standalone file with hover tooltips showing state name and value — works in any browser, no internet needed. Best for sharing digitally.</td></tr>
-          <tr><td>Print / Save as PDF</td><td>Opens your browser's print dialog, from which you can save directly as a PDF.</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-
-    <!-- ════ TIPS ════ -->
-    <div class="section" id="tips">
-      <div class="section-header">
-        <div class="section-icon icon-blue">💡</div>
-        <h2>Tips &amp; Tricks</h2>
-      </div>
-
-      <div class="card">
-        <div class="card-title">📊 Use discrete steps for reports</div>
-        <p>5–6 color steps rather than a continuous gradient — readers map colors to legend values far more easily.</p>
-      </div>
-      <div class="card">
-        <div class="card-title">🏷️ Keep overlay titles short</div>
-        <p>Switch to "Above map" placement for longer titles or when using a subtitle.</p>
-      </div>
-      <div class="card">
-        <div class="card-title">📐 Comparing multiple maps</div>
-        <p>Turn off Auto min/max and set the same fixed range on all of them, so colors are directly comparable across years or datasets.</p>
-      </div>
-      <div class="card">
-        <div class="card-title">🎨 Choose diverging for centered data</div>
-        <p>Whenever your data has a natural center point — national average, zero growth, previous year's value — a diverging scale communicates it better than sequential.</p>
-      </div>
-      <div class="card">
-        <div class="card-title">📁 SVG for editing, PNG for final</div>
-        <p>Export as SVG if the map will be resized or edited further; use PNG only for the final, fixed-size version.</p>
-      </div>
-    </div>
-
-
-    <!-- ════ FAQ ════ -->
-    <div class="section" id="faq">
-      <div class="section-header">
-        <div class="section-icon icon-red">❓</div>
-        <h2>Troubleshooting / FAQ</h2>
-      </div>
-
-      <h3>My state isn't matching (red dot in the data table)</h3>
-      <p>Check for typos, extra spaces, or an unsupported name variant. Standard names, common alternate spellings, and 2-letter codes are all supported — try the full standard name if a shorthand doesn't match.</p>
-
-      <h3>I changed a slider but the map didn't update</h3>
-      <p>Most controls update live, but if the map appears unchanged, click <strong>⟳ Generate / Refresh Map</strong> to force a redraw.</p>
-
-      <h3>The legend or a label looks cut off / cramped</h3>
-      <p>Try reducing the relevant font size (Labels tab), or switch title placement to "Above map" and increase the top padding to free up space.</p>
-
-      <h3>Can I use my own state boundary data?</h3>
-      <p>Not in the current version — DeshDash ships with its own built-in India boundary data. Custom boundary support, including district-level maps, is planned for a future version.</p>
-    </div>
-
-
-    <!-- ════ VERSION HISTORY ════ -->
-    <div class="section" id="history">
-      <div class="section-header">
-        <div class="section-icon icon-gray">🕓</div>
-        <h2>Version History</h2>
-      </div>
-
-      <div class="version-row">
-        <span class="version-tag current">1.1</span>
-        <ul class="version-items">
-          <li><b>Upload CSV</b> now handles any column layout — pick which column is the state name and which is the value from dropdowns populated straight from your file's headers (replaces the old fixed two-column upload)</li>
-          <li>Switch between multiple value columns in the same file to redraw the map with a different metric, without re-uploading</li>
-          <li>Diverging scale midpoint moved to a slider below Min/Max, visible only in manual-range mode, bounded by your current range</li>
-          <li>Midpoint slider step size now matches your data's decimal precision (whole numbers step by 1, 2-decimal data steps by 0.01, etc.)</li>
-          <li>Fixed: legend now correctly bends around a custom midpoint instead of always assuming it's centered</li>
-          <li>Fixed: Min/Max fields now prefill with the data's actual auto-computed range when switching off Auto min/max, instead of resetting to 0/100</li>
-        </ul>
-      </div>
-
-      <div class="version-row">
-        <span class="version-tag">1.0</span>
-        <ul class="version-items">
-          <li>Initial public release — Data, Style, Labels, and Export tabs complete</li>
-          <li>Sequential and Diverging color scales with custom gradients</li>
-          <li>Leader-line labels with collision detection and per-state position adjustment</li>
-          <li>Paste CSV and Upload CSV data entry, with header/delimiter auto-detection</li>
-          <li>Title placement: Overlay (inside map) or Above map (reserved space)</li>
-          <li>Export as SVG, PNG (2×), interactive HTML, or print to PDF</li>
-          <li>Self-contained — D3.js and India's boundary data embedded directly in the page, no external libraries loaded</li>
-        </ul>
-      </div>
-    </div>
-
-    <!-- Footer -->
-    <div style="border-top: 1px solid var(--border); padding-top: 1.5rem; margin-top: 2rem; font-size: 12.5px; color: var(--muted);">
-      DeshDash ver. 1.1 &nbsp;·&nbsp; Hosted at anilyayavar.github.io/deshdash &nbsp;·&nbsp; No data leaves your browser &nbsp;·&nbsp;
-      Developed by <strong>Anil Kumar Goyal</strong> ·
-      <a href="https://www.linkedin.com/in/anil-kumar-goyal/" target="_blank" rel="noopener" style="color:var(--accent)">LinkedIn</a>
-    </div>
-
-  </div><!-- /content -->
-</div><!-- /main -->
+<footer>DeshDash — part of the Insight Studio suite. This help page covers the unified app's Univariate, Bivariate, Categorical, and Annotations modes.</footer>
 
 <script>
-  const links = document.querySelectorAll('.nav-link');
-  const sections = document.querySelectorAll('.section');
-
-  const observer = new IntersectionObserver(entries => {
-    entries.forEach(e => {
-      if (e.isIntersecting) {
-        links.forEach(l => l.classList.remove('active'));
-        const active = document.querySelector(`.nav-link[href="#${e.target.id}"]`);
-        if (active) active.classList.add('active');
-      }
-    });
-  }, { threshold: 0.3 });
-
-  sections.forEach(s => observer.observe(s));
+document.querySelectorAll('.tab-btn').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('.tab-btn').forEach(x => x.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(x => x.classList.remove('active'));
+  b.classList.add('active');
+  document.getElementById('panel-' + b.dataset.tab)?.classList.add('active');
+  window.scrollTo({top: 0, behavior: 'instant'});
+}));
 </script>
+
 </body>
 </html>

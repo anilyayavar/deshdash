@@ -457,7 +457,7 @@ input[type=checkbox] { accent-color: var(--accent); width: 14px; height: 14px; c
           <option value="7" selected>7 (default)</option>
           <option value="8">8 (palette max)</option>
         </select>
-        <div class="exp-desc" style="margin-top:4px">Type a category per state in the Data tab (e.g. dominant crop, scheme type, region class). The categories covering the <b>most states</b> keep their own color, up to the limit above; rarer ones share a gray "Other" swatch — the legend tells you how many states that covers. Capped at 8 because that's how many distinguishable hues each palette has; going higher would force two kept categories to share a color.</div>
+        <div class="exp-desc" style="margin-top:4px">Type a category per state in the Data tab (e.g. dominant crop, scheme type, region class). The categories covering the <b>most states</b> keep their own color, up to the limit above; rarer ones share a gray "Other" swatch — the legend tells you how many states that covers, not how many category names got merged.<br><br><b>Why the dropdown stops at 8:</b> each palette (Set2/Dark2/Paired/Pastel2) ships exactly 8 distinguishable hues. Choosing a higher limit isn't possible here — it would force two "kept" categories to silently reuse the same color, which defeats the purpose of keeping them separate.</div>
       </div>
       <div class="sl" id="sl-ann-fill" style="display:none">Annotation Fill</div>
       <div id="ann-fill-body" style="display:none">

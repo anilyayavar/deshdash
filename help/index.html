@@ -185,6 +185,8 @@ footer { text-align: center; padding: 20px; font-size: 11px; color: #8991a3; }
     <p>What's <b>permanently drawn on the map</b> (state name, values, notes) is controlled separately from what you see on <b>hover</b>. Hovering any state always shows its full detail in a tooltip, no matter how much you've hidden from the permanent map — turn things off in <i>Labels tab &rarr; What to Show</i> to declutter a busy map without ever losing information.</p>
     <h3>Everything is draggable</h3>
     <p>The legend, every label box, the takeaway box, and every annotation note can be dragged directly on the map to reposition it. You can also hide an individual state's label entirely (Labels tab &rarr; Adjust Label Position &rarr; set that state to "Hidden") if one particular label is in the way — its data is still there on hover.</p>
+    <h3>Collapsing the control panel</h3>
+    <p>The <b>&#9776;</b> button at the top of the screen hides the entire left control column so the map fills the whole window — handy when presenting or screenshotting. Click it again to bring the panel back; it remembers whether it was collapsed the next time you open DeshDash.</p>
 
     <h2>Saving and exporting</h2>
     <p>The <b>Export</b> tab has two different things — don't mix them up:</p>
@@ -214,15 +216,16 @@ footer { text-align: center; padding: 20px; font-size: 11px; color: #8991a3; }
       <div class="feat-card"><b>Undo for the data table</b><span>One-step undo reverts the last table edit, paste, or clear — a safety net while you're cleaning up data.</span></div>
       <div class="feat-card"><b>Map Takeaway callout</b><span>A single map-wide "so what" text box, separate from per-state labels, with mini-markdown formatting — available in all four modes, draggable, position-locked to a corner with fine offset.</span></div>
       <div class="feat-card"><b>Per-mode visual theming</b><span>Each mode has its own accent color across the whole interface, so you always know which mode you're in at a glance.</span></div>
-      <div class="feat-card"><b>Annotations rich text</b><span>Notes support <code># heading</code>, <code>**bold**</code>, and <code>__underline__</code> mini-markdown, an expandable editor for long notes, and optional Group-based coloring.</span></div>
+      <div class="feat-card"><b>Annotations rich text</b><span>Notes support <code># heading</code>, <code>- bullet</code>, <code>**bold**</code>, <code>*italic*</code>, and <code>__underline__</code> mini-markdown, an expandable editor for long notes, and optional Group-based coloring.</span></div>
       <div class="feat-card"><b>Collision-avoiding notes</b><span>Annotation boxes that would overlap are automatically nudged apart — vertically first, then sideways if still crowded.</span></div>
+      <div class="feat-card"><b>Collapsible control panel</b><span>Hide the entire left panel with the <code>&#9776;</code> button at the top of the screen for a full-width view — useful when presenting or capturing a clean screenshot.</span></div>
     </div>
 
     <h2>What's unique to each mode</h2>
     <table class="ctl">
       <tr><td>Univariate</td><td>Sequential or diverging color scales, continuous or stepped, with full manual range/midpoint control.</td></tr>
       <tr><td>Bivariate</td><td>A true two-variable color grid (3×3 to 5×5) instead of two separate maps, with named/independently-formatted X and Y values.</td></tr>
-      <tr><td>Categorical</td><td>Direct text categories — no binning — capped at 7 colors with an automatic "Other" overflow swatch so the legend never becomes unreadable.</td></tr>
+      <tr><td>Categorical</td><td>Direct text categories — no binning. The categories covering the most states keep their own color (adjustable cap, 3–8, default 7); the rest automatically share one "Other" swatch — both the cap and the Other color are yours to set — so the legend never becomes unreadable.</td></tr>
       <tr><td>Annotations</td><td>Free-text notes per state with three color modes (distinct / single / by Group), fully independent of any numeric scale.</td></tr>
     </table>
   </div>
@@ -269,7 +272,7 @@ footer { text-align: center; padding: 20px; font-size: 11px; color: #8991a3; }
       <tr><td>Steps</td><td>Continuous smooth gradient, or a fixed number of discrete color bands (4–8) — discrete bands are often easier to read at a glance in print.</td></tr>
       <tr><td>Other Colors</td><td><b>No-data fill</b> for states with missing values; <b>Border color</b>/<b>width</b> between states; <b>Background/ocean color</b>; <b>Background opacity</b> (SVG export only — PNG export is always solid).</td></tr>
       <tr><td>Legend</td><td><b>Show legend</b> toggle; <b>Position</b> (Center/Left/Right — sets the default drop point); <b>Width</b> as % of map. Draggable on the map regardless of the position setting.</td></tr>
-      <tr><td>Map Takeaway</td><td><b>Show takeaway box</b> toggle reveals a text box (supports <code># </code> heading, <code>**bold**</code>, <code>__underline__</code>), a corner <b>Position</b> + fine <b>dx/dy</b> offset, <b>Text size/color</b>, and <b>Box fill/border color</b>. One map-wide callout, separate from per-state labels — also draggable.</td></tr>
+      <tr><td>Map Takeaway</td><td><b>Show takeaway box</b> toggle reveals a text box (supports <code># </code> heading, <code>- </code> bullet, <code>**bold**</code>, <code>*italic*</code>, <code>__underline__</code>), a corner <b>Position</b> + fine <b>dx/dy</b> offset, <b>Text size/color</b>, and <b>Box fill/border color</b>. One map-wide callout, separate from per-state labels — also draggable.</td></tr>
     </table>
 
     <h3>Labels tab</h3>
@@ -347,7 +350,7 @@ footer { text-align: center; padding: 20px; font-size: 11px; color: #8991a3; }
       <h4>What you get — map out</h4>
       <div class="result-flex">
         <img class="example-img" src="examples/categorical-example.png" alt="Categorical example map: Punjab, West Bengal, Kerala, Rajasthan, and Assam each colored by their crop category, with West Bengal and Kerala sharing the Rice color">
-        <div class="result">Every distinct category gets its own solid color: Wheat one color, Rice another (so West Bengal and Kerala match, since they share a category), Millets and Tea their own. The legend lists each category with its swatch. If a 6th category appeared beyond 7 distinct ones, it would join the gray "Other" swatch instead of getting a new color.</div>
+        <div class="result">Every distinct category gets its own solid color: Wheat one color, Rice another (so West Bengal and Kerala match, since they share a category), Millets and Tea their own. The legend lists each category with its swatch. If more categories appeared than the cap allows, the ones covering the fewest states would join a gray "Other" swatch instead of getting their own color — the cap (default 7) and the Other swatch's color are both adjustable in the Style tab.</div>
       </div>
     </div>
 
@@ -362,7 +365,8 @@ footer { text-align: center; padding: 20px; font-size: 11px; color: #8991a3; }
     <h3>Style tab</h3>
     <table class="ctl wide">
       <tr><td>Categorical Colors</td><td><b>Palette</b> (Set2 / Dark2 / Paired / Pastel2 — ColorBrewer qualitative sets chosen so adjacent colors stay visually distinct).</td></tr>
-      <tr><td>7-category cap</td><td>Up to 7 distinct categories get their own color; anything beyond that automatically shares one gray <b>"Other"</b> swatch in the legend, so it never becomes an unreadable wall of tiny colors. If you're hitting the cap often, consider merging minor categories yourself.</td></tr>
+      <tr><td>Distinct-color cap</td><td><b>Distinct colors before grouping into "Other"</b> — adjustable from 3 up to 8 (default 7; 8 is the ceiling because each palette only has 8 distinguishable hues). The categories covering the <i>most states</i> get their own color, in that order — not whichever appeared first in your data — so the cap always keeps the categories that matter most to the map.</td></tr>
+      <tr><td>"Other" swatch</td><td>Categories beyond the cap are grouped into one gray <b>"Other"</b> swatch, with its own color picker here — useful if a palette's own last color sits too close to the default Other gray to tell apart. The legend's <code>Other (N)</code> label counts <i>states</i>, not how many category names got merged.</td></tr>
       <tr><td>Other Colors / Legend / Map Takeaway</td><td>Same controls as Univariate. <b>Color Scale Type</b> and <b>Scale Range</b> are hidden — there's no numeric scale to configure.</td></tr>
     </table>
 
@@ -395,7 +399,7 @@ footer { text-align: center; padding: 20px; font-size: 11px; color: #8991a3; }
 
     <h3>Data tab</h3>
     <table class="ctl wide">
-      <tr><td>Annotations Data table</td><td>Replaces "State Data" entirely in this mode. Columns: State/UT, <b>Group</b> (optional — used by the Categorical-by-Group color mode below), <b>Note</b> (supports <code>**bold**</code>, <code>__underline__</code>, <code># heading</code>). Click the small <b>&#10530;</b> button on any row to edit its note in a larger popup editor. <b>+ Row</b>, <b>Clear</b>, <b>Reset to Sample</b> buttons (no Undo in this table).</td></tr>
+      <tr><td>Annotations Data table</td><td>Replaces "State Data" entirely in this mode. Columns: State/UT, <b>Group</b> (optional — used by the Categorical-by-Group color mode below), <b>Note</b> (supports <code>**bold**</code>, <code>*italic*</code>, <code>__underline__</code>, <code># heading</code>, <code>- bullet</code>). Click the small <b>&#10530;</b> button on any row to edit its note in a larger popup editor. <b>+ Row</b>, <b>Clear</b>, <b>Reset to Sample</b> buttons (no Undo in this table).</td></tr>
       <tr><td>Paste CSV</td><td><code>State,Note text</code> pairs. Type a literal <code>\n</code> inside a cell for a line break within a note. Header row auto-detected. <b>Group is not set by import</b> — add it in the Table view afterward if needed.</td></tr>
       <tr><td>Upload CSV</td><td>Pick <b>State/UT column</b> and <b>Note text column</b>.</td></tr>
     </table>
@@ -417,7 +421,7 @@ footer { text-align: center; padding: 20px; font-size: 11px; color: #8991a3; }
       <tr><td>Adjust Annotation Position &amp; Color</td><td>Pick a <b>State</b>, nudge with <b>dx/dy</b> or drag its note box directly on the map (overlapping boxes auto-shift apart — vertically, then sideways). <b>No leader line (box only)</b>; <b>Hide this state's note on map</b> (still shows on hover); <b>State fill (override)</b> color + Reset button; <b>Label border matches state color</b> checkbox, with a <b>Custom border color</b> picker when unchecked.</td></tr>
       <tr><td>Hidden in this mode</td><td>What to Show / External Labels / Inline Labels / Adjust Label Position (the numeric-mode versions) don't apply here — replaced entirely by the four sections above.</td></tr>
     </table>
-    <div class="tip"><b>Formatting inside a note:</b> <code># Heading text</code> at the start of a line for a bold heading, <code>**bold**</code> for inline bold, <code>__underline__</code> for inline underline, <code>\n</code> in pasted/uploaded text for a line break.</div>
+    <div class="tip"><b>Formatting inside a note:</b> <code># Heading text</code> at the start of a line for a bold heading, <code>- Bullet text</code> at the start of a line for a bullet point, <code>**bold**</code> for inline bold, <code>*italic*</code> for inline italic, <code>__underline__</code> for inline underline, <code>\n</code> in pasted/uploaded text for a line break.</div>
   </div>
 
   <!-- ══════════ BEST PRACTICES ══════════ -->
@@ -437,7 +441,7 @@ footer { text-align: center; padding: 20px; font-size: 11px; color: #8991a3; }
       <li><b>Use Diverging only when there's a real midpoint that matters</b> — a benchmark, a target, a zero line. If "more is simply more," Sequential is easier for readers to interpret at a glance.</li>
       <li><b>Turn off Auto min/max when comparing several maps side by side</b>, and set the same manual Min/Max on all of them — otherwise identical colors on two maps can mean different values.</li>
       <li><b>Keep the Bivariate grid at 3×3 unless you specifically need finer distinctions</b> — 4×4 and 5×5 pack more nuance in but the legend gets harder to read at a glance, especially in a printed report.</li>
-      <li><b>In Categorical, stay at or under 7 real categories</b>, and merge minor ones yourself before you hit the cap — that way you control which categories get grouped, instead of the automatic "Other" bucket deciding for you.</li>
+      <li><b>In Categorical, the cap keeps your most common categories distinct automatically</b> — rarer ones join "Other" on their own, ranked by how many states share each category, not by which one you typed first. If you want more (or fewer) than the default 7 kept distinct, adjust the cap directly in the Style tab instead of manually merging categories.</li>
     </ul>
 
     <h2>Decluttering and presenting</h2>

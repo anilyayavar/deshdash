@@ -118,6 +118,19 @@ input[type=checkbox] { accent-color: var(--accent); width: 14px; height: 14px; c
 .cpw span { font-size: 10.5px; color: #7a7f9a; }
 .exp-group { display: flex; flex-direction: column; gap: 8px; }
 .exp-desc { font-size: 9.5px; color: #4a4f6a; margin-top: 2px; }
+/* Explanatory text is collapsed behind a small "?" toggle instead of always
+   showing — keeps the panel scannable; click reveals the .help-t text in
+   place, same interaction as the section-header collapse/expand already
+   used elsewhere. One delegated listener (see init()) handles every icon. */
+.help-q {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0;
+  background: #2a2a4a; color: #8aabff; font-size: 9.5px; font-weight: 700;
+  border: 1px solid #3a4a7a; cursor: pointer; user-select: none; vertical-align: middle;
+}
+.help-q:hover { background: #3a3a5a; color: #b8caff; }
+.help-t { display: none; margin-left: 6px; }
+.help-t.open { display: inline; }
 #status { padding: 7px 14px; font-size: 10.5px; color: #4a4f6a; background: #0a0a18; border-top: 1px solid #2a2a4a; min-height: 28px; }
 #status.ok { color: #2a9a6a; } #status.warn { color: #c08030; } #status.err { color: #c04040; }
 
@@ -200,12 +213,10 @@ input[type=checkbox] { accent-color: var(--accent); width: 14px; height: 14px; c
         <label class="cl">Paste data — then click Parse &amp; Load</label>
         <textarea id="csv-txt" rows="9" placeholder="Andhra Pradesh,45000&#10;Bihar,32000&#10;MP,4.2&#10;MH,3.9"></textarea>
         <button class="btn btn-primary btn-sm" id="btn-parse" style="margin-top:6px">Parse &amp; Load</button>
-        <div class="exp-desc" style="margin-top:6px;line-height:1.7">
-          <b>Accepted formats:</b> comma-separated <code>State,Value</code> or tab-separated (paste directly from Excel).<br>
+        <div class="exp-desc" style="margin-top:6px;line-height:1.7"><span class="help-q" tabindex="0" role="button" aria-label="Show help">?</span><span class="help-t"><b>Accepted formats:</b> comma-separated <code>State,Value</code> or tab-separated (paste directly from Excel).<br>
           <b>State names:</b> full names (<i>Maharashtra</i>) or 2-letter codes (<i>MH, MP, WB…</i>).<br>
           <b>Header row:</b> auto-detected and skipped.<br>
-          <b>Numbers:</b> commas in numbers are fine — <i>1,00,000</i> or <i>12,500</i> both work.
-        </div>
+          <b>Numbers:</b> commas in numbers are fine — <i>1,00,000</i> or <i>12,500</i> both work.</span></div>
       </div>
 
       <div id="multi-panel" style="display:none">
@@ -220,14 +231,10 @@ input[type=checkbox] { accent-color: var(--accent); width: 14px; height: 14px; c
             <label class="cl">Value column (Y — second variable)</label>
             <select id="sel-value-col-y"></select>
           </div>
-          <div class="exp-desc" style="margin-top:4px">
-            If your file has more than one value column, switch <b>Value column</b> anytime to redraw the map with a different metric — no need to re-upload.
-          </div>
+          <div class="exp-desc" style="margin-top:4px"><span class="help-q" tabindex="0" role="button" aria-label="Show help">?</span><span class="help-t">If your file has more than one value column, switch <b>Value column</b> anytime to redraw the map with a different metric — no need to re-upload.</span></div>
           <button class="btn btn-primary btn-sm" id="btn-multi-load" style="margin-top:8px">Load Selected Columns</button>
         </div>
-        <div class="exp-desc" style="margin-top:6px;line-height:1.7">
-          <b>Works with any CSV</b> — a simple two-column file (state, value) or a wide sheet with extra columns (population, growth rate, literacy rate, etc). Columns are auto-detected and pre-selected in the dropdowns above; confirm or change them, then click Load. If there are several numeric columns, switch between them anytime without re-uploading.
-        </div>
+        <div class="exp-desc" style="margin-top:6px;line-height:1.7"><span class="help-q" tabindex="0" role="button" aria-label="Show help">?</span><span class="help-t"><b>Works with any CSV</b> — a simple two-column file (state, value) or a wide sheet with extra columns (population, growth rate, literacy rate, etc). Columns are auto-detected and pre-selected in the dropdowns above; confirm or change them, then click Load. If there are several numeric columns, switch between them anytime without re-uploading.</span></div>
       </div>
 
       <div class="sl" id="sl-value-format">Value Format</div>
@@ -246,7 +253,7 @@ input[type=checkbox] { accent-color: var(--accent); width: 14px; height: 14px; c
         </select>
       </div>
       <div id="value-format-bivariate" style="display:none">
-        <div class="exp-desc" style="margin-bottom:6px">Bivariate combines two independent metrics — name and format each one on its own, since e.g. "Literacy %" and "Population (Cr)" need different units.</div>
+        <div class="exp-desc" style="margin-bottom:6px"><span class="help-q" tabindex="0" role="button" aria-label="Show help">?</span><span class="help-t">Bivariate combines two independent metrics — name and format each one on its own, since e.g. "Literacy %" and "Population (Cr)" need different units.</span></div>
         <label class="cl" style="color:#5ac8c8;font-weight:700">Value X</label>
         <input type="text" id="bi-lbl-x" placeholder="Name, e.g. Literacy" style="margin-bottom:4px">
         <div class="row2">
@@ -314,19 +321,17 @@ input[type=checkbox] { accent-color: var(--accent); width: 14px; height: 14px; c
             <button class="btn btn-sm btn-secondary" id="btn-ann-reset-sample">Reset to Sample</button>
           </div>
           <div id="ann-match-info"></div>
-          <div class="exp-desc" style="margin-top:6px"><b>Group</b> is optional — give two or more states the same Group name to color them alike (Style tab → Annotation Fill → Categorical). Each state with text gets a draggable note box near its centroid, auto-shifted to avoid overlaps. Click the &#10530; button on a row to edit its note in a bigger box.</div>
+          <div class="exp-desc" style="margin-top:6px"><span class="help-q" tabindex="0" role="button" aria-label="Show help">?</span><span class="help-t"><b>Group</b> is optional — give two or more states the same Group name to color them alike (Style tab → Annotation Fill → Categorical). Each state with text gets a draggable note box near its centroid, auto-shifted to avoid overlaps. Click the &#10530; button on a row to edit its note in a bigger box.</span></div>
         </div>
 
         <div id="ann-csv-panel" style="display:none">
           <label class="cl">Paste data — then click Parse &amp; Load</label>
           <textarea id="ann-csv-txt" rows="9" placeholder="Andhra Pradesh,Example note for this state&#10;Bihar,Another example note"></textarea>
           <button class="btn btn-primary btn-sm" id="btn-ann-parse" style="margin-top:6px">Parse &amp; Load</button>
-          <div class="exp-desc" style="margin-top:6px;line-height:1.7">
-            <b>Format:</b> comma-separated <code>State,Note text</code> or tab-separated (paste directly from Excel).<br>
+          <div class="exp-desc" style="margin-top:6px;line-height:1.7"><span class="help-q" tabindex="0" role="button" aria-label="Show help">?</span><span class="help-t"><b>Format:</b> comma-separated <code>State,Note text</code> or tab-separated (paste directly from Excel).<br>
             <b>State names:</b> full names (<i>Maharashtra</i>) or 2-letter codes (<i>MH, MP, WB…</i>).<br>
             <b>Line breaks inside a note:</b> type <code>\n</code> where you want a new line.<br>
-            <b>Header row:</b> auto-detected and skipped. <b>Group</b> isn't set by import — add it in the Table view afterward if needed.
-          </div>
+            <b>Header row:</b> auto-detected and skipped. <b>Group</b> isn't set by import — add it in the Table view afterward if needed.</span></div>
         </div>
 
         <div id="ann-multi-panel" style="display:none">
@@ -339,9 +344,7 @@ input[type=checkbox] { accent-color: var(--accent); width: 14px; height: 14px; c
             <select id="ann-sel-value-col"></select>
             <button class="btn btn-primary btn-sm" id="btn-ann-multi-load" style="margin-top:8px">Load Selected Columns</button>
           </div>
-          <div class="exp-desc" style="margin-top:6px;line-height:1.7">
-            Columns are auto-detected and pre-selected below; confirm or change them, then click Load. Use <code>\n</code> inside a cell for a line break. Group isn't set by import.
-          </div>
+          <div class="exp-desc" style="margin-top:6px;line-height:1.7"><span class="help-q" tabindex="0" role="button" aria-label="Show help">?</span><span class="help-t">Columns are auto-detected and pre-selected below; confirm or change them, then click Load. Use <code>\n</code> inside a cell for a line break. Group isn't set by import.</span></div>
         </div>
       </div>
 
@@ -360,7 +363,7 @@ input[type=checkbox] { accent-color: var(--accent); width: 14px; height: 14px; c
       </div>
       <!-- Reverse checkbox — shown for both seq and div -->
       <div class="tr" style="margin:4px 0">
-        <span>Reverse scale</span>
+        <span>Reverse scale <span class="help-q" tabindex="0" role="button" aria-label="Show help">?</span><span class="help-t exp-desc">Flips which end of the scheme is light vs. dark — e.g. makes high values dark instead of low values dark.</span></span>
         <input type="checkbox" id="chk-rev">
       </div>
       <!-- Custom sequential pickers -->
@@ -432,7 +435,7 @@ input[type=checkbox] { accent-color: var(--accent); width: 14px; height: 14px; c
           <option value="blueorange">Blue-Orange</option>
           <option value="custom">Custom (pick your own below)</option>
         </select>
-        <div class="exp-desc" style="margin-bottom:6px">Four corner colors, blended across the grid. Low X / Low Y is the base; each axis blends toward its own "high" corner. Picking any preset fills the pickers below — edit them afterward to make a custom palette.</div>
+        <div class="exp-desc" style="margin-bottom:6px"><span class="help-q" tabindex="0" role="button" aria-label="Show help">?</span><span class="help-t">Four corner colors, blended across the grid. Low X / Low Y is the base; each axis blends toward its own "high" corner. Picking any preset fills the pickers below — edit them afterward to make a custom palette.</span></div>
         <label class="cl">Low X, Low Y (base)</label>
         <div class="cpw"><input type="color" id="bi-clr-ll" value="#e8e8e8"></div>
         <label class="cl">High X, Low Y</label>
@@ -463,8 +466,8 @@ input[type=checkbox] { accent-color: var(--accent); width: 14px; height: 14px; c
         </select>
         <label class="cl" style="margin-top:10px">"Other" swatch color</label>
         <div class="cpw"><input type="color" id="clr-cat-other" value="#b0b0b0"><span>Grouped/rare categories</span></div>
-        <div class="exp-desc" style="margin-top:4px">Some palettes' last color is a similar gray to the default here — if the two look too close together in the legend, change one of them.</div>
-        <div class="exp-desc" style="margin-top:4px">Type a category per state in the Data tab (e.g. dominant crop, scheme type, region class). The categories covering the <b>most states</b> keep their own color, up to the limit above; rarer ones share a gray "Other" swatch — the legend tells you how many states that covers, not how many category names got merged.<br><br><b>Why the dropdown stops at 8:</b> each palette (Set2/Dark2/Paired/Pastel2) ships exactly 8 distinguishable hues. Choosing a higher limit isn't possible here — it would force two "kept" categories to silently reuse the same color, which defeats the purpose of keeping them separate.</div>
+        <div class="exp-desc" style="margin-top:4px"><span class="help-q" tabindex="0" role="button" aria-label="Show help">?</span><span class="help-t">Some palettes' last color is a similar gray to the default here — if the two look too close together in the legend, change one of them.</span></div>
+        <div class="exp-desc" style="margin-top:4px"><span class="help-q" tabindex="0" role="button" aria-label="Show help">?</span><span class="help-t">Type a category per state in the Data tab (e.g. dominant crop, scheme type, region class). The categories covering the <b>most states</b> keep their own color, up to the limit above; rarer ones share a gray "Other" swatch — the legend tells you how many states that covers, not how many category names got merged.<br><br><b>Why the dropdown stops at 8:</b> each palette (Set2/Dark2/Paired/Pastel2) ships exactly 8 distinguishable hues. Choosing a higher limit isn't possible here — it would force two "kept" categories to silently reuse the same color, which defeats the purpose of keeping them separate.</span></div>
       </div>
       <div class="sl" id="sl-ann-fill" style="display:none">Annotation Fill</div>
       <div id="ann-fill-body" style="display:none">
@@ -528,14 +531,14 @@ input[type=checkbox] { accent-color: var(--accent); width: 14px; height: 14px; c
             <option value="4">4</option>
           </select>
         </div>
-        <div class="exp-desc" style="margin-top:4px">Horizontal keeps the legend compact but can run wide with many categories or long names. Vertical/Grid stack entries instead — labels over ~14 characters wrap to a second line.</div>
+        <div class="exp-desc" style="margin-top:4px"><span class="help-q" tabindex="0" role="button" aria-label="Show help">?</span><span class="help-t">Horizontal keeps the legend compact but can run wide with many categories or long names. Vertical/Grid stack entries instead — labels over ~14 characters wrap to a second line.</span></div>
       </div>
 
       <div class="sl">Map Takeaway</div>
       <div class="tr"><span>Show takeaway box</span><input type="checkbox" id="chk-takeaway"></div>
       <div id="takeaway-opts" style="display:none">
         <textarea id="txt-takeaway" rows="3" placeholder="e.g. # Key takeaway&#10;Kerala leads on this metric."></textarea>
-        <div class="exp-desc" style="margin-top:2px">Use <code># </code> for a heading line, <code>- </code> for a bullet line, <code>**bold**</code>, <code>*italic*</code>, <code>__underline__</code>.</div>
+        <div class="exp-desc" style="margin-top:2px"><span class="help-q" tabindex="0" role="button" aria-label="Show help">?</span><span class="help-t">Use <code># </code> for a heading line, <code>- </code> for a bullet line, <code>**bold**</code>, <code>*italic*</code>, <code>__underline__</code>.</span></div>
         <label class="cl">Position</label>
         <select id="sel-takeaway-pos">
           <option value="top-left">Top left</option>
@@ -556,7 +559,7 @@ input[type=checkbox] { accent-color: var(--accent); width: 14px; height: 14px; c
         <div class="cpw"><input type="color" id="clr-takeaway-bg" value="#ffffff"></div>
         <label class="cl">Border color</label>
         <div class="cpw"><input type="color" id="clr-takeaway-border" value="#888888"></div>
-        <div class="exp-desc" style="margin-top:4px">One map-wide callout, separate from per-state labels — a "so what" takeaway. Drag it directly on the map too.</div>
+        <div class="exp-desc" style="margin-top:4px"><span class="help-q" tabindex="0" role="button" aria-label="Show help">?</span><span class="help-t">One map-wide callout, separate from per-state labels — a "so what" takeaway. Drag it directly on the map too.</span></div>
       </div>
     </div>
 
@@ -582,13 +585,13 @@ input[type=checkbox] { accent-color: var(--accent); width: 14px; height: 14px; c
       <input type="text" id="inp-note" placeholder="Figures in ₹ Crore">
 
       <div class="sl" id="sl-what-to-show">What to Show</div>
-      <div class="exp-desc" style="margin-bottom:6px">These control what's permanently drawn <b>on the map</b>. Hovering a state always shows its full detail in a tooltip regardless of these — turn things off here to keep the map clean without losing any information.</div>
+      <div class="exp-desc" style="margin-bottom:6px"><span class="help-q" tabindex="0" role="button" aria-label="Show help">?</span><span class="help-t">These control what's permanently drawn <b>on the map</b>. Hovering a state always shows its full detail in a tooltip regardless of these — turn things off here to keep the map clean without losing any information.</span></div>
       <div class="tr"><span>Show state name</span><input type="checkbox" id="chk-sn" checked></div>
       <div id="show-val-single"><div class="tr"><span id="show-val-single-label">Show value</span><input type="checkbox" id="chk-sv" checked></div></div>
       <div id="show-val-bivariate" style="display:none">
         <div class="tr"><span>Show Value X <span id="show-val-x-name" style="color:#5ac8c8"></span></span><input type="checkbox" id="bi-chk-show-x"></div>
         <div class="tr"><span>Show Value Y <span id="show-val-y-name" style="color:#be64ac"></span></span><input type="checkbox" id="bi-chk-show-y"></div>
-        <div class="exp-desc">Off by default — two value lines per state gets cluttered fast on a bivariate map. State names + colors carry the pattern; hover for exact numbers.</div>
+        <div class="exp-desc"><span class="help-q" tabindex="0" role="button" aria-label="Show help">?</span><span class="help-t">Off by default — two value lines per state gets cluttered fast on a bivariate map. State names + colors carry the pattern; hover for exact numbers.</span></div>
       </div>
       <div class="tr"><span>Abbreviate name</span><input type="checkbox" id="chk-ab"></div>
       <div class="sl" id="sl-external-labels">External Labels (leader-line states)</div>
@@ -657,12 +660,12 @@ input[type=checkbox] { accent-color: var(--accent); width: 14px; height: 14px; c
         </div>
       </div>
       <div class="tr" style="margin-top:2px"><span>No leader line (box only)</span><input type="checkbox" id="chk-noline"></div>
-      <div class="exp-desc" style="margin-top:6px"><b>Label style</b> lets you override which states get a box vs. inline text, or hide a state's label from the map entirely — handy for decluttering a busy cluster of small states without losing the data (hidden states still show full detail on hover). <b>You can also drag any external label box directly on the map</b> — dx/dy here update to match.</div>
+      <div class="exp-desc" style="margin-top:6px"><span class="help-q" tabindex="0" role="button" aria-label="Show help">?</span><span class="help-t"><b>Label style</b> lets you override which states get a box vs. inline text, or hide a state's label from the map entirely — handy for decluttering a busy cluster of small states without losing the data (hidden states still show full detail on hover). <b>You can also drag any external label box directly on the map</b> — dx/dy here update to match.</span></div>
 
       <!-- ANNOTATIONS-ONLY LABEL CONTROLS -->
       <div class="sl" id="sl-ann-text-style" style="display:none">Annotation Text Style</div>
       <div id="ann-text-style-body" style="display:none">
-        <div class="exp-desc" style="margin-bottom:6px">Hovering a state always shows its full note in a tooltip, however these are set — turn off "Show note text on map" for a clean colored map that still gives full detail on hover.</div>
+        <div class="exp-desc" style="margin-bottom:6px"><span class="help-q" tabindex="0" role="button" aria-label="Show help">?</span><span class="help-t">Hovering a state always shows its full note in a tooltip, however these are set — turn off "Show note text on map" for a clean colored map that still gives full detail on hover.</span></div>
         <div class="tr"><span>Show note text on map</span><input type="checkbox" id="ann-chk-show-onmap" checked></div>
         <div class="tr"><span>Show state name heading</span><input type="checkbox" id="ann-chk-sn" checked></div>
         <label class="cl">State name size (px)</label>
@@ -675,7 +678,7 @@ input[type=checkbox] { accent-color: var(--accent); width: 14px; height: 14px; c
         <div class="rr"><input type="range" id="ann-rng-wc" min="14" max="45" step="1" value="26"><span id="ann-lbl-wc">26</span></div>
         <label class="cl">Text color</label>
         <div class="cpw"><input type="color" id="ann-clr-txt" value="#0f2622"></div>
-        <div class="tr" style="margin-top:6px"><span>Text matches state color</span><input type="checkbox" id="ann-chk-text-match"></div>
+        <div class="tr" style="margin-top:6px"><span>Text matches state color <span class="help-q" tabindex="0" role="button" aria-label="Show help">?</span><span class="help-t exp-desc">Uses that state's own fill color for its text instead of the fixed Text color below — automatically darkened if needed to stay readable against a light fill.</span></span><input type="checkbox" id="ann-chk-text-match"></div>
         <label class="cl">Text opacity</label>
         <div class="rr"><input type="range" id="ann-rng-topa" min="0.3" max="1" step="0.05" value="1"><span id="ann-lbl-topa">1</span></div>
       </div>
@@ -698,7 +701,7 @@ input[type=checkbox] { accent-color: var(--accent); width: 14px; height: 14px; c
         <div class="rr"><input type="range" id="ann-rng-lbo" min="0.1" max="1" step="0.05" value="0.92"><span id="ann-lbl-lbo">0.92</span></div>
         <label class="cl">Border color</label>
         <div class="cpw"><input type="color" id="ann-clr-lbb" value="#aaaaaa"><span>Box border (fallback)</span></div>
-        <div class="exp-desc">By default every state's label border matches its own fill color (see "Adjust Annotation Position &amp; Color" below) — this picker only applies where that's unchecked for a state.</div>
+        <div class="exp-desc"><span class="help-q" tabindex="0" role="button" aria-label="Show help">?</span><span class="help-t">By default every state's label border matches its own fill color (see "Adjust Annotation Position &amp; Color" below) — this picker only applies where that's unchecked for a state.</span></div>
         <label class="cl">Border width</label>
         <div class="rr"><input type="range" id="ann-rng-lbw" min="0" max="2" step="0.25" value="0.5"><span id="ann-lbl-lbw">0.5</span></div>
         <label class="cl">Padding</label>
@@ -731,7 +734,7 @@ input[type=checkbox] { accent-color: var(--accent); width: 14px; height: 14px; c
         </div>
         <div class="tr" style="margin-top:2px"><span>No leader line (box only)</span><input type="checkbox" id="ann-chk-noline"></div>
         <div class="tr" style="margin-top:2px"><span>Hide this state's note on map</span><input type="checkbox" id="ann-chk-hide"></div>
-        <div class="exp-desc">Hidden states still show their color and their full note on hover — only the permanent box is removed.</div>
+        <div class="exp-desc"><span class="help-q" tabindex="0" role="button" aria-label="Show help">?</span><span class="help-t">Hidden states still show their color and their full note on hover — only the permanent box is removed.</span></div>
         <label class="cl" style="margin-top:10px">State fill (override)</label>
         <div style="display:flex;gap:6px;align-items:center">
           <input type="color" id="ann-clr-ov-fill" style="width:34px;height:28px;padding:1px;border-radius:4px;cursor:pointer;border:1px solid #c8cedf;background:transparent">
@@ -742,7 +745,7 @@ input[type=checkbox] { accent-color: var(--accent); width: 14px; height: 14px; c
           <label class="cl" style="margin:0;flex:1">Custom border color</label>
           <input type="color" id="ann-clr-ov-border" style="width:34px;height:28px;padding:1px;border-radius:4px;cursor:pointer;border:1px solid #c8cedf;background:transparent">
         </div>
-        <div class="exp-desc" style="margin-top:6px"><b>You can also drag any note box directly on the map</b> — dx/dy here update to match. Overlapping boxes are auto-shifted (vertically, then sideways if still crowded).</div>
+        <div class="exp-desc" style="margin-top:6px"><span class="help-q" tabindex="0" role="button" aria-label="Show help">?</span><span class="help-t"><b>You can also drag any note box directly on the map</b> — dx/dy here update to match. Overlapping boxes are auto-shifted (vertically, then sideways if still crowded).</span></div>
       </div>
     </div>
 
@@ -811,7 +814,7 @@ input[type=checkbox] { accent-color: var(--accent); width: 14px; height: 14px; c
   <div style="background:#14142a;border:1px solid #2f2f55;border-radius:8px;padding:16px;width:min(520px,90vw);box-shadow:0 10px 40px rgba(0,0,0,0.5)">
     <div style="font-size:12px;font-weight:700;color:#8890b8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px" id="ann-text-modal-title">Edit note text</div>
     <textarea id="ann-text-modal-area" rows="10" style="width:100%;min-height:200px;font-size:13px"></textarea>
-    <div class="exp-desc" style="margin-top:4px">Use <code># </code> for a heading line, <code>- </code> for a bullet line, <code>**bold**</code> for inline bold, <code>*italic*</code> for inline italic, <code>__underline__</code> for inline underline.</div>
+    <div class="exp-desc" style="margin-top:4px"><span class="help-q" tabindex="0" role="button" aria-label="Show help">?</span><span class="help-t">Use <code># </code> for a heading line, <code>- </code> for a bullet line, <code>**bold**</code> for inline bold, <code>*italic*</code> for inline italic, <code>__underline__</code> for inline underline.</span></div>
     <div class="btn-group" style="margin-top:10px;justify-content:flex-end">
       <button class="btn btn-secondary btn-sm" id="ann-text-modal-cancel">Cancel</button>
       <button class="btn btn-primary btn-sm" id="ann-text-modal-save">Save</button>
@@ -3539,6 +3542,25 @@ function applyTheme(mode) {
 function init() {
   buildGrids();  // populate color-scheme swatches on startup
   applyTheme(VIZ_MODE);  // paint the default (Univariate) theme before first interaction
+
+  // One delegated listener for every "?" help toggle in the panel, rather
+  // than wiring each .exp-desc individually — new ones just need the
+  // .help-q/.help-t markup, no JS changes. Keyboard-accessible (Enter/Space)
+  // since .help-q is a tabindex'd, role="button" element, not a real button.
+  document.addEventListener('click', e => {
+    const q = e.target.closest('.help-q');
+    if (!q) return;
+    const t = q.nextElementSibling;
+    if (t && t.classList.contains('help-t')) t.classList.toggle('open');
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key!=='Enter' && e.key!==' ') return;
+    const q = e.target.closest?.('.help-q');
+    if (!q) return;
+    e.preventDefault();
+    const t = q.nextElementSibling;
+    if (t && t.classList.contains('help-t')) t.classList.toggle('open');
+  });
 
   // Whole-panel collapse toggle — separate from the per-section collapsible
   // headings already inside the panel; this hides the entire control column

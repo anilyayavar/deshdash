@@ -17,13 +17,17 @@
   --accent-text-on-accent: #ffffff;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
+/* Single source of truth for the panel width — #panel, #btn-panel-toggle's
+   collapsed position, and the JS toggle logic all read this one value
+   instead of repeating the "420" literal in three places. */
+:root { --panel-w: 420px; }
 body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; height: 100vh; overflow: hidden; background: #eef0f4; color: #1a1a2e; }
 
 /* ─── PANEL ─── */
-#panel { width: 420px; min-width: 360px; flex: 0 0 420px; background: #1a1a2e; display: flex; flex-direction: column; overflow: hidden; box-shadow: 3px 0 14px rgba(0,0,0,0.35); z-index: 10; }
+#panel { width: var(--panel-w); min-width: 360px; flex: 0 0 var(--panel-w); background: #1a1a2e; display: flex; flex-direction: column; overflow: hidden; box-shadow: 3px 0 14px rgba(0,0,0,0.35); z-index: 10; }
 #panel.collapsed { width: 0; min-width: 0; flex-basis: 0; box-shadow: none; }
 #btn-panel-toggle {
-  position: fixed; top: 14px; left: 420px; transform: translateX(-50%);
+  position: fixed; top: 14px; left: var(--panel-w); transform: translateX(-50%);
   width: 36px; height: 36px; border: none; border-radius: 8px;
   background: #1a1a2e; cursor: pointer;
   z-index: 20; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
@@ -457,6 +461,9 @@ input[type=checkbox] { accent-color: var(--accent); width: 14px; height: 14px; c
           <option value="7" selected>7 (default)</option>
           <option value="8">8 (palette max)</option>
         </select>
+        <label class="cl" style="margin-top:10px">"Other" swatch color</label>
+        <div class="cpw"><input type="color" id="clr-cat-other" value="#b0b0b0"><span>Grouped/rare categories</span></div>
+        <div class="exp-desc" style="margin-top:4px">Some palettes' last color is a similar gray to the default here — if the two look too close together in the legend, change one of them.</div>
         <div class="exp-desc" style="margin-top:4px">Type a category per state in the Data tab (e.g. dominant crop, scheme type, region class). The categories covering the <b>most states</b> keep their own color, up to the limit above; rarer ones share a gray "Other" swatch — the legend tells you how many states that covers, not how many category names got merged.<br><br><b>Why the dropdown stops at 8:</b> each palette (Set2/Dark2/Paired/Pastel2) ships exactly 8 distinguishable hues. Choosing a higher limit isn't possible here — it would force two "kept" categories to silently reuse the same color, which defeats the purpose of keeping them separate.</div>
       </div>
       <div class="sl" id="sl-ann-fill" style="display:none">Annotation Fill</div>
@@ -826,12 +833,20 @@ const ABBR = {
   'Uttar Pradesh':'UP','Uttaranchal':'UK','Uttarakhand':'UK','West Bengal':'WB',
 };
 
-// Override GeoJSON names for display (old/alternate names in source data)
+// Override GeoJSON names for display when the user hasn't typed a name of
+// their own for that state (see stateNames/displayName) — these three are the
+// GeoJSON source's old/superseded official names, so the fallback should show
+// the current one. Deliberately NOT listing Kerala/Keralam here: unlike the
+// three above, "Keralam" isn't the current official name (yet) it's an
+// alternate spelling some users type — ALIASES already normalizes "Keralam"
+// typed as data back to canon "Kerala", and displayName() shows exactly
+// whatever the user typed for a state that does have data. So the fallback
+// for a state with no data at all should be the GeoJSON's own name (Kerala),
+// not a forced rename.
 const DISPLAY_NAMES = {
   'Uttaranchal': 'Uttarakhand',
   'Orissa':      'Odisha',
   'Pondicherry': 'Puducherry',
-  'Kerala':      'Keralam',
 };
 
 // Leader line offsets (at 660px map width; scaled proportionally)
@@ -1064,14 +1079,10 @@ function lookupIn(dataObj, f) {
 }
 function lookupVal(f)  { return lookupIn(userData, f); }
 function lookupValY(f) { return lookupIn(userDataY, f); }
+// Univariate's own values, run through the shared autoDecimalsFor() below
+// (kept as its own named function since fmt() calls it directly by name).
 function autoDecimals() {
-  // Look at all data values and find the max decimal places needed (cap at 3)
-  const vals=Object.values(userData).filter(v=>v!==null&&!isNaN(v));
-  if (!vals.length) return 0;
-  return Math.min(3, Math.max(...vals.map(v=>{
-    const s=String(v); const i=s.indexOf('.');
-    return i<0 ? 0 : s.length-i-1;
-  })));
+  return autoDecimalsFor(Object.values(userData));
 }
 function fmt(v) {
   if (v===null||v===undefined||isNaN(v)) return '—';
@@ -1205,20 +1216,25 @@ function buildCategoricalScale() {
   const overflowCount = ranked.slice(max).reduce((sum,[,c])=>sum+c, 0);
   const colorMap = {};
   categories.forEach((cat,i) => { colorMap[cat] = palette[i % palette.length]; });
-  catScale = { categories, colorMap, overflowCount };
+  // User-adjustable — some palettes' own last color (e.g. Set2's, Pastel2's)
+  // is itself a light gray close to the default Other swatch, which could
+  // make two legend entries look identical; letting the user pick either
+  // color out of that collision beats a fixed constant.
+  const otherColor = document.getElementById('clr-cat-other')?.value || CATEGORICAL_OTHER_COLOR;
+  catScale = { categories, colorMap, overflowCount, otherColor };
 }
 function getCategoricalColor(f) {
   if (!catScale) return C.nodataColor;
   const v = lookupVal(f);
   if (v===null || v==='') return C.nodataColor;
   const t = String(v).trim();
-  return catScale.colorMap[t] || CATEGORICAL_OTHER_COLOR;  // beyond the cap -> shared "Other" color
+  return catScale.colorMap[t] || catScale.otherColor;  // beyond the cap -> shared "Other" color
 }
 function renderCategoricalLegend(svg, W, H, BOT, LEGEND_H) {
   if (!C.showLegend||!catScale||LEGEND_H===0) return;
   const labels = catScale.categories.slice();
   const colors = labels.map(c=>catScale.colorMap[c]);
-  if (catScale.overflowCount>0) { labels.push(`Other (${catScale.overflowCount})`); colors.push(CATEGORICAL_OTHER_COLOR); }
+  if (catScale.overflowCount>0) { labels.push(`Other (${catScale.overflowCount})`); colors.push(catScale.otherColor); }
   const sw=14, gap=8;
   const widths = labels.map(t => sw+4+Math.max(30, t.length*6.2)+gap);
   const totalW = widths.reduce((a,b)=>a+b,0) - gap;
@@ -1749,9 +1765,13 @@ function renderMap() {
     .each(function(d) {
       const n=geoName(d), dn=displayName(canon(n), n), v=lookupVal(d);
       this.setAttribute('data-name', dn);
+      // Joined with a real newline (valid inside an HTML attribute) rather
+      // than " / " — exportHTML()'s standalone tooltip script splits on this
+      // to render actual stacked lines, matching the in-app hover tooltip
+      // instead of flattening bivariate/annotation multi-line values.
       const dataVal = VIZ_MODE==='annotations'
-        ? tooltipDispVal(d).replace(/<br>/g,' / ')
-        : (v!==null ? dispVal(d, {ignoreToggles:true}).join(' / ') : '');
+        ? tooltipDispVal(d).replace(/<br>/g,'\n')
+        : (v!==null ? dispVal(d, {ignoreToggles:true}).join('\n') : '');
       this.setAttribute('data-val', dataVal);
       // no SVG <title> — avoids double tooltip (native + custom div)
     })
@@ -2270,6 +2290,11 @@ function setValueColumnMode(isCategorical) {
 function compileData() {
   userData={};
   userDataY={};
+  // Rebuilt from scratch every compile, same as userData/userDataY — otherwise
+  // a deleted row's typed name would linger forever (stateNames was never
+  // cleared before) and keep overriding the map's display name for a state
+  // that no longer has any data.
+  stateNames={};
   let matched=0, total=0;
   document.querySelectorAll('#tbody tr').forEach(tr=>{
     const sEl=tr.querySelector('.s'), vEl=tr.querySelector('.v'), v2El=tr.querySelector('.v2'), dot=tr.querySelector('.mdot');
@@ -2453,6 +2478,7 @@ function annLoadMultiColumnData() {
 function compileAnnotations() {
   annotations={};
   annotationGroups={};
+  stateNames={};  // rebuilt from this table only — see compileData()'s comment
   let matched=0, total=0;
   document.querySelectorAll('#ann-tbody tr').forEach(tr=>{
     const sEl=tr.querySelector('.as'), tEl=tr.querySelector('.at'), gEl=tr.querySelector('.ag'), dot=tr.querySelector('.mdot');
@@ -2515,15 +2541,13 @@ function annEffectiveBorder(cn) {
   if (ov && ov.borderMatch===false) return ov.border || AC.labelBorderColor || null;
   return annEffectiveFill(cn);
 }
-function annHexLuminance(hex) {
-  const c=d3.color(hex); if (!c) return 0.5;
-  const toL=v=>{ v/=255; return v<=0.04045?v/12.92:Math.pow((v+0.055)/1.055,2.4); };
-  return 0.2126*toL(c.r)+0.7152*toL(c.g)+0.0722*toL(c.b);
-}
+// Annotations mode reuses hexLuminance() (defined above, in the univariate
+// color-scale section) — it was previously duplicated here under a separate
+// name; both computed the identical WCAG relative-luminance formula.
 function annDarkenForReadability(hex, targetLum=0.35) {
-  if (annHexLuminance(hex) <= targetLum) return hex;
+  if (hexLuminance(hex) <= targetLum) return hex;
   let result=hex;
-  for (let t=0.08; t<=1; t+=0.08) { result=d3.interpolateRgb(hex,'#000000')(t); if (annHexLuminance(result)<=targetLum) break; }
+  for (let t=0.08; t<=1; t+=0.08) { result=d3.interpolateRgb(hex,'#000000')(t); if (hexLuminance(result)<=targetLum) break; }
   return result;
 }
 function annEffectiveTextColor(cn) {
@@ -2789,7 +2813,9 @@ const tt=document.getElementById('tt'),ttn=document.getElementById('ttn'),ttv=do
 document.querySelectorAll('svg path[data-name]').forEach(p=>{
   p.addEventListener('mousemove',e=>{
     ttn.textContent=p.dataset.name;
-    ttv.textContent=p.dataset.val||'No data';
+    const raw=p.dataset.val||'No data';
+    const esc=raw.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    ttv.innerHTML=esc.replace(/\\n/g,'<br>');
     tt.style.display='block';
     tt.style.left=(e.clientX+16)+'px';
     tt.style.top=(e.clientY-12)+'px';
@@ -3000,6 +3026,7 @@ function exportProject() {
     vizMode: VIZ_MODE,
     catPalette: document.getElementById('sel-cat-palette')?.value || 'Set2',
     catMax: document.getElementById('sel-cat-max')?.value || '7',
+    catOtherColor: document.getElementById('clr-cat-other')?.value || CATEGORICAL_OTHER_COLOR,
     biGrid: document.getElementById('sel-bi-grid')?.value || '3',
     biColX: lastBiColX, biColY: lastBiColY,
     biCorners: {...BIVARIATE_CORNERS},
@@ -3041,6 +3068,10 @@ function importProject(data) {
   if (data.catMax) {
     const sel=document.getElementById('sel-cat-max');
     if (sel) sel.value = data.catMax;
+  }
+  if (data.catOtherColor) {
+    const inp=document.getElementById('clr-cat-other');
+    if (inp) inp.value = data.catOtherColor;
   }
   if (data.biGrid) {
     const sel=document.getElementById('sel-bi-grid');
@@ -3297,9 +3328,12 @@ function init() {
   (function initPanelToggle() {
     const panelEl = document.getElementById('panel');
     const btn = document.getElementById('btn-panel-toggle');
+    // Read the same --panel-w the CSS uses, so this never drifts out of sync
+    // with #panel's actual width if that variable is ever changed.
+    const panelW = getComputedStyle(document.documentElement).getPropertyValue('--panel-w').trim() || '420px';
     function setCollapsed(collapsed) {
       panelEl.classList.toggle('collapsed', collapsed);
-      btn.style.left = collapsed ? '0px' : '420px';
+      btn.style.left = collapsed ? '0px' : panelW;
       btn.title = collapsed ? 'Expand panel' : 'Collapse panel';
       try { localStorage.setItem('deshdash-panel-collapsed', collapsed ? '1' : '0'); } catch (e) {}
     }
@@ -3469,9 +3503,10 @@ function init() {
   document.getElementById('ann-text-modal-save').addEventListener('click', saveAnnTextModal);
   document.getElementById('ann-text-modal-backdrop').addEventListener('click', e=>{ if (e.target.id==='ann-text-modal-backdrop') closeAnnTextModal(); });
 
-  // Categorical — Data tab: palette, and the "Other" grouping threshold
+  // Categorical — Data tab: palette, the "Other" grouping threshold, and its color
   document.getElementById('sel-cat-palette').addEventListener('change', liveRender);
   document.getElementById('sel-cat-max').addEventListener('change', liveRender);
+  document.getElementById('clr-cat-other').addEventListener('input', liveRender);
 
   // Bivariate — Data tab: grid size, names/format, separator
   document.getElementById('sel-bi-grid').addEventListener('change', liveRender);

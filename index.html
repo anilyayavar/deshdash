@@ -464,21 +464,6 @@ input[type=checkbox] { accent-color: var(--accent); width: 14px; height: 14px; c
         <label class="cl" style="margin-top:10px">"Other" swatch color</label>
         <div class="cpw"><input type="color" id="clr-cat-other" value="#b0b0b0"><span>Grouped/rare categories</span></div>
         <div class="exp-desc" style="margin-top:4px">Some palettes' last color is a similar gray to the default here — if the two look too close together in the legend, change one of them.</div>
-        <label class="cl" style="margin-top:10px">Legend layout</label>
-        <select id="sel-cat-legend-layout" style="width:100%;padding:4px 6px;border:1px solid #c8cedf;border-radius:5px;font-size:12px;background:#fff">
-          <option value="horizontal" selected>Horizontal (one row)</option>
-          <option value="vertical">Vertical (one column)</option>
-          <option value="grid">Grid</option>
-        </select>
-        <div id="cat-legend-cols-row" style="display:none">
-          <label class="cl" style="margin-top:8px">Grid columns</label>
-          <select id="sel-cat-legend-cols" style="width:100%;padding:4px 6px;border:1px solid #c8cedf;border-radius:5px;font-size:12px;background:#fff">
-            <option value="2" selected>2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-          </select>
-        </div>
-        <div class="exp-desc" style="margin-top:4px">Horizontal keeps the legend compact but can run wide with many categories or long names. Vertical/Grid stack entries instead — labels over ~14 characters wrap to a second line.</div>
         <div class="exp-desc" style="margin-top:4px">Type a category per state in the Data tab (e.g. dominant crop, scheme type, region class). The categories covering the <b>most states</b> keep their own color, up to the limit above; rarer ones share a gray "Other" swatch — the legend tells you how many states that covers, not how many category names got merged.<br><br><b>Why the dropdown stops at 8:</b> each palette (Set2/Dark2/Paired/Pastel2) ships exactly 8 distinguishable hues. Choosing a higher limit isn't possible here — it would force two "kept" categories to silently reuse the same color, which defeats the purpose of keeping them separate.</div>
       </div>
       <div class="sl" id="sl-ann-fill" style="display:none">Annotation Fill</div>
@@ -528,6 +513,23 @@ input[type=checkbox] { accent-color: var(--accent); width: 14px; height: 14px; c
       <select id="sel-lp"><option value="center">Center</option><option value="left">Left</option><option value="right">Right</option></select>
       <label class="cl">Width (% of map)</label>
       <div class="rr"><input type="range" id="rng-lw" min="30" max="90" step="5" value="60"><span id="lbl-lw">60%</span></div>
+      <div id="cat-legend-layout-opts" style="display:none">
+        <label class="cl" style="margin-top:10px">Legend layout</label>
+        <select id="sel-cat-legend-layout" style="width:100%;padding:4px 6px;border:1px solid #c8cedf;border-radius:5px;font-size:12px;background:#fff">
+          <option value="horizontal" selected>Horizontal (one row)</option>
+          <option value="vertical">Vertical (one column)</option>
+          <option value="grid">Grid</option>
+        </select>
+        <div id="cat-legend-cols-row" style="display:none">
+          <label class="cl" style="margin-top:8px">Grid columns</label>
+          <select id="sel-cat-legend-cols" style="width:100%;padding:4px 6px;border:1px solid #c8cedf;border-radius:5px;font-size:12px;background:#fff">
+            <option value="2" selected>2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+          </select>
+        </div>
+        <div class="exp-desc" style="margin-top:4px">Horizontal keeps the legend compact but can run wide with many categories or long names. Vertical/Grid stack entries instead — labels over ~14 characters wrap to a second line.</div>
+      </div>
 
       <div class="sl">Map Takeaway</div>
       <div class="tr"><span>Show takeaway box</span><input type="checkbox" id="chk-takeaway"></div>
@@ -2897,6 +2899,12 @@ function setModeStyleControls(mode) {
       if (body) { body.style.display=''; sl.classList.add('sl-open'); }
     }
   }
+  // "Legend layout" (Horizontal/Vertical/Grid) lives in the shared Legend
+  // section, not Categorical Colors — it's a legend-positioning choice like
+  // Position/Width above it, just Categorical-specific since only that
+  // legend is a variable-length list of swatches.
+  const catLegendOpts=document.getElementById('cat-legend-layout-opts');
+  if (catLegendOpts) catLegendOpts.style.display = isCat ? '' : 'none';
 }
 // Shows/hides the palette / single-fill / categorical-legend sub-blocks inside
 // "Annotation Fill" based on which color mode is selected — mirrors LabelDash's

@@ -448,7 +448,16 @@ input[type=checkbox] { accent-color: var(--accent); width: 14px; height: 14px; c
           <option value="Paired">Paired</option>
           <option value="Pastel2">Pastel2</option>
         </select>
-        <div class="exp-desc" style="margin-top:4px">Type a category per state in the Data tab (e.g. dominant crop, scheme type, region class) — up to 7 distinct categories get their own color; any beyond that share a gray "Other" swatch so the legend stays readable.</div>
+        <label class="cl" style="margin-top:10px">Distinct colors before grouping into "Other"</label>
+        <select id="sel-cat-max" style="width:100%;padding:4px 6px;border:1px solid #c8cedf;border-radius:5px;font-size:12px;background:#fff">
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+          <option value="6">6</option>
+          <option value="7" selected>7 (default)</option>
+          <option value="8">8 (palette max)</option>
+        </select>
+        <div class="exp-desc" style="margin-top:4px">Type a category per state in the Data tab (e.g. dominant crop, scheme type, region class). The categories covering the <b>most states</b> keep their own color, up to the limit above; rarer ones share a gray "Other" swatch — the legend tells you how many states that covers. Capped at 8 because that's how many distinguishable hues each palette has; going higher would force two kept categories to share a color.</div>
       </div>
       <div class="sl" id="sl-ann-fill" style="display:none">Annotation Fill</div>
       <div id="ann-fill-body" style="display:none">
@@ -1162,22 +1171,38 @@ function setStatus(msg, t='') {
 // ── CATEGORICAL COLOR SCALE (direct category text — not binned numbers) ────
 // A category map plots actual qualitative data (dominant crop, scheme type,
 // region class, ...) — one color per distinct text value the user typed or
-// uploaded, not a number sliced into ranked buckets. Capped at CATEGORICAL_MAX
-// distinct values so the legend stays readable; anything beyond that groups
-// into a shared "Other" swatch rather than silently running out of colors.
-const CATEGORICAL_MAX = 7;
+// uploaded, not a number sliced into ranked buckets. Capped at the user's
+// chosen max (default 7, see sel-cat-max) so the legend stays readable and
+// colors stay distinguishable; the cap is bounded by each palette's 8 hues
+// so raising it can never force two kept categories to share a color.
+// Which categories survive the cap is decided by PREVALENCE — the N
+// categories covering the most states keep their own color; rarer ones are
+// grouped into a shared gray "Other" swatch. This is deliberate: the whole
+// point of the cap is to keep the legend/map readable, so the categories
+// that matter to the most area of the map are the ones worth a distinct hue.
+// Ties (equal state counts) fall back to first-appearance order, which
+// Array.prototype.sort's stability guarantees deterministically.
+const CATEGORICAL_MAX_DEFAULT = 7;
 const CATEGORICAL_OTHER_COLOR = '#b0b0b0';
 let catScale = null;  // { categories[], colorMap{cat:color}, overflowCount }
 function buildCategoricalScale() {
-  const order = [];
+  const counts = new Map();  // category text -> number of states holding it
   Object.values(userData).forEach(v => {
     const t = (v||'').toString().trim();
-    if (t && !order.includes(t)) order.push(t);
+    if (!t) return;
+    counts.set(t, (counts.get(t)||0) + 1);
   });
-  if (!order.length) { catScale=null; return; }
+  if (!counts.size) { catScale=null; return; }
   const palette = ANN_PALETTES[document.getElementById('sel-cat-palette')?.value || 'Set2'] || ANN_PALETTES.Set2;
-  const categories = order.slice(0, CATEGORICAL_MAX);
-  const overflowCount = Math.max(0, order.length - CATEGORICAL_MAX);
+  const maxSel = parseInt(document.getElementById('sel-cat-max')?.value, 10);
+  const max = Math.min(palette.length, maxSel || CATEGORICAL_MAX_DEFAULT);
+  const ranked = Array.from(counts.entries()).sort((a,b) => b[1]-a[1]);  // by prevalence, desc
+  const categories = ranked.slice(0, max).map(([cat])=>cat);
+  // overflowCount is the number of STATES pushed into "Other", not the number
+  // of merged category names — the legend reads "Other (N)" and N should
+  // answer "how many states is this gray swatch hiding," not "how many crop
+  // types got merged."
+  const overflowCount = ranked.slice(max).reduce((sum,[,c])=>sum+c, 0);
   const colorMap = {};
   categories.forEach((cat,i) => { colorMap[cat] = palette[i % palette.length]; });
   catScale = { categories, colorMap, overflowCount };
@@ -2974,6 +2999,7 @@ function exportProject() {
     // project restores the exact same view, not just the underlying data.
     vizMode: VIZ_MODE,
     catPalette: document.getElementById('sel-cat-palette')?.value || 'Set2',
+    catMax: document.getElementById('sel-cat-max')?.value || '7',
     biGrid: document.getElementById('sel-bi-grid')?.value || '3',
     biColX: lastBiColX, biColY: lastBiColY,
     biCorners: {...BIVARIATE_CORNERS},
@@ -3011,6 +3037,10 @@ function importProject(data) {
   if (data.catPalette) {
     const sel=document.getElementById('sel-cat-palette');
     if (sel) sel.value = data.catPalette;
+  }
+  if (data.catMax) {
+    const sel=document.getElementById('sel-cat-max');
+    if (sel) sel.value = data.catMax;
   }
   if (data.biGrid) {
     const sel=document.getElementById('sel-bi-grid');
@@ -3439,8 +3469,9 @@ function init() {
   document.getElementById('ann-text-modal-save').addEventListener('click', saveAnnTextModal);
   document.getElementById('ann-text-modal-backdrop').addEventListener('click', e=>{ if (e.target.id==='ann-text-modal-backdrop') closeAnnTextModal(); });
 
-  // Categorical — Data tab: palette
+  // Categorical — Data tab: palette, and the "Other" grouping threshold
   document.getElementById('sel-cat-palette').addEventListener('change', liveRender);
+  document.getElementById('sel-cat-max').addEventListener('change', liveRender);
 
   // Bivariate — Data tab: grid size, names/format, separator
   document.getElementById('sel-bi-grid').addEventListener('change', liveRender);

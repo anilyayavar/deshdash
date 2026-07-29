@@ -446,14 +446,14 @@ input[type=checkbox] { accent-color: var(--accent); width: 14px; height: 14px; c
       <div class="sl" id="sl-cat-fill" style="display:none">Categorical Colors</div>
       <div id="cat-fill-body" style="display:none">
         <label class="cl">Palette (one color per category)</label>
-        <select id="sel-cat-palette" style="width:100%;padding:4px 6px;border:1px solid #c8cedf;border-radius:5px;font-size:12px;background:#fff">
+        <select id="sel-cat-palette">
           <option value="Set2" selected>Set2</option>
           <option value="Dark2">Dark2</option>
           <option value="Paired">Paired</option>
           <option value="Pastel2">Pastel2</option>
         </select>
         <label class="cl" style="margin-top:10px">Distinct colors before grouping into "Other"</label>
-        <select id="sel-cat-max" style="width:100%;padding:4px 6px;border:1px solid #c8cedf;border-radius:5px;font-size:12px;background:#fff">
+        <select id="sel-cat-max">
           <option value="3">3</option>
           <option value="4">4</option>
           <option value="5">5</option>
@@ -486,14 +486,14 @@ input[type=checkbox] { accent-color: var(--accent); width: 14px; height: 14px; c
         <div id="ann-cat-legend-opts" style="display:none">
           <div class="tr" style="margin-top:2px"><span>Show group legend on map</span><input type="checkbox" id="ann-chk-cat-legend" checked></div>
           <label class="cl" style="margin-top:8px">Legend layout</label>
-          <select id="sel-ann-legend-layout" style="width:100%;padding:4px 6px;border:1px solid #c8cedf;border-radius:5px;font-size:12px;background:#fff">
+          <select id="sel-ann-legend-layout">
             <option value="horizontal" selected>Horizontal (wraps automatically)</option>
             <option value="vertical">Vertical (one column)</option>
             <option value="grid">Grid</option>
           </select>
           <div id="ann-legend-cols-row" style="display:none">
             <label class="cl" style="margin-top:8px">Grid columns</label>
-            <select id="sel-ann-legend-cols" style="width:100%;padding:4px 6px;border:1px solid #c8cedf;border-radius:5px;font-size:12px;background:#fff">
+            <select id="sel-ann-legend-cols">
               <option value="2" selected>2</option>
               <option value="3">3</option>
               <option value="4">4</option>
@@ -515,14 +515,14 @@ input[type=checkbox] { accent-color: var(--accent); width: 14px; height: 14px; c
       <div class="rr"><input type="range" id="rng-lw" min="30" max="90" step="5" value="60"><span id="lbl-lw">60%</span></div>
       <div id="cat-legend-layout-opts" style="display:none">
         <label class="cl" style="margin-top:10px">Legend layout</label>
-        <select id="sel-cat-legend-layout" style="width:100%;padding:4px 6px;border:1px solid #c8cedf;border-radius:5px;font-size:12px;background:#fff">
+        <select id="sel-cat-legend-layout">
           <option value="horizontal" selected>Horizontal (one row)</option>
           <option value="vertical">Vertical (one column)</option>
           <option value="grid">Grid</option>
         </select>
         <div id="cat-legend-cols-row" style="display:none">
           <label class="cl" style="margin-top:8px">Grid columns</label>
-          <select id="sel-cat-legend-cols" style="width:100%;padding:4px 6px;border:1px solid #c8cedf;border-radius:5px;font-size:12px;background:#fff">
+          <select id="sel-cat-legend-cols">
             <option value="2" selected>2</option>
             <option value="3">3</option>
             <option value="4">4</option>
@@ -568,7 +568,7 @@ input[type=checkbox] { accent-color: var(--accent); width: 14px; height: 14px; c
       <label class="cl">Subtitle</label>
       <input type="text" id="inp-subtitle" placeholder="e.g. Financial Year 2024-25">
       <label class="cl">Title placement</label>
-      <select id="sel-title-pos" style="width:100%;margin-bottom:4px;padding:4px 6px;border:1px solid #c8cedf;border-radius:5px;font-size:12px;background:#fff">
+      <select id="sel-title-pos" style="margin-bottom:4px">
         <option value="overlay">Overlay (inside map)</option>
         <option value="above">Above map (reserved space)</option>
       </select>
@@ -630,9 +630,9 @@ input[type=checkbox] { accent-color: var(--accent); width: 14px; height: 14px; c
       <div class="rr"><input type="range" id="rng-io" min="0.3" max="1" step="0.05" value="0.75"><span id="lbl-io">0.75</span></div>
       <div class="sl" id="sl-adjust-label-position">Adjust Label Position</div>
       <label class="cl">State</label>
-      <select id="sel-leader-state" style="width:100%;margin-bottom:6px;padding:4px 6px;border:1px solid #c8cedf;border-radius:5px;font-size:12px;background:#fff"></select>
+      <select id="sel-leader-state" style="margin-bottom:6px"></select>
       <label class="cl">Label style</label>
-      <select id="sel-label-mode" style="width:100%;margin-bottom:6px;padding:4px 6px;border:1px solid #c8cedf;border-radius:5px;font-size:12px;background:#fff">
+      <select id="sel-label-mode" style="margin-bottom:6px">
         <option value="auto">Auto (default for this state)</option>
         <option value="external">Always external (box + leader line)</option>
         <option value="inline">Always inline (text on the state)</option>
@@ -710,7 +710,7 @@ input[type=checkbox] { accent-color: var(--accent); width: 14px; height: 14px; c
       <div class="sl" id="sl-ann-adjust" style="display:none">Adjust Annotation Position &amp; Color</div>
       <div id="ann-adjust-body" style="display:none">
         <label class="cl">State</label>
-        <select id="ann-sel-leader-state" style="width:100%;margin-bottom:6px;padding:4px 6px;border:1px solid #c8cedf;border-radius:5px;font-size:12px;background:#fff"></select>
+        <select id="ann-sel-leader-state" style="margin-bottom:6px"></select>
         <div style="display:flex;gap:10px;margin-bottom:4px">
           <div style="flex:1">
             <label class="cl" style="margin-bottom:3px">dx <span style="color:#4a5a7a;font-size:9px">← neg / pos →</span></label>

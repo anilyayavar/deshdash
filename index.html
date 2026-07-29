@@ -3311,6 +3311,9 @@ function init() {
     const msg = VIZTYPE_NOTICES[VIZ_MODE];
     if (msg) { notice.textContent = msg; notice.style.display = ''; }
     else { notice.style.display = 'none'; }
+    // Same convention as every other control: only auto-refresh if a map is
+    // already on screen; otherwise the user still has to click Generate first.
+    liveRender();
   }));
 
   // Tabs

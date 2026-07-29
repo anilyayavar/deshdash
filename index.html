@@ -302,7 +302,7 @@ input[type=checkbox] { accent-color: var(--accent); width: 14px; height: 14px; c
                 <th></th>
                 <th>State / UT</th>
                 <th>Group</th>
-                <th>Note (**bold**, __underline__, # heading)</th>
+                <th>Note (**bold**, *italic*, __underline__, # heading, - bullet)</th>
                 <th></th>
               </tr></thead>
               <tbody id="ann-tbody"></tbody>
@@ -504,7 +504,7 @@ input[type=checkbox] { accent-color: var(--accent); width: 14px; height: 14px; c
       <div class="tr"><span>Show takeaway box</span><input type="checkbox" id="chk-takeaway"></div>
       <div id="takeaway-opts" style="display:none">
         <textarea id="txt-takeaway" rows="3" placeholder="e.g. # Key takeaway&#10;Kerala leads on this metric."></textarea>
-        <div class="exp-desc" style="margin-top:2px">Use <code># </code> for a heading line, <code>**bold**</code>, <code>__underline__</code>.</div>
+        <div class="exp-desc" style="margin-top:2px">Use <code># </code> for a heading line, <code>- </code> for a bullet line, <code>**bold**</code>, <code>*italic*</code>, <code>__underline__</code>.</div>
         <label class="cl">Position</label>
         <select id="sel-takeaway-pos">
           <option value="top-left">Top left</option>
@@ -780,7 +780,7 @@ input[type=checkbox] { accent-color: var(--accent); width: 14px; height: 14px; c
   <div style="background:#14142a;border:1px solid #2f2f55;border-radius:8px;padding:16px;width:min(520px,90vw);box-shadow:0 10px 40px rgba(0,0,0,0.5)">
     <div style="font-size:12px;font-weight:700;color:#8890b8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px" id="ann-text-modal-title">Edit note text</div>
     <textarea id="ann-text-modal-area" rows="10" style="width:100%;min-height:200px;font-size:13px"></textarea>
-    <div class="exp-desc" style="margin-top:4px">Use <code># </code> for a heading line, <code>**bold**</code> for inline bold, <code>__underline__</code> for inline underline.</div>
+    <div class="exp-desc" style="margin-top:4px">Use <code># </code> for a heading line, <code>- </code> for a bullet line, <code>**bold**</code> for inline bold, <code>*italic*</code> for inline italic, <code>__underline__</code> for inline underline.</div>
     <div class="btn-group" style="margin-top:10px;justify-content:flex-end">
       <button class="btn btn-secondary btn-sm" id="ann-text-modal-cancel">Cancel</button>
       <button class="btn btn-primary btn-sm" id="ann-text-modal-save">Save</button>
@@ -1154,8 +1154,10 @@ function tooltipDispVal(f) {
     const cn = canon(geoName(f));
     const text = annotations[cn];
     if (!text || !text.trim()) return '';
-    // Strip markdown-lite markers for a clean plain-text tooltip.
-    const plain = text.replace(/\*\*(.+?)\*\*/g,'$1').replace(/__(.+?)__/g,'$1').replace(/^#\s?/gm,'');
+    // Strip markdown-lite markers for a clean plain-text tooltip. Bold must
+    // go before italic so a leftover single "*" is never mistaken for one.
+    const plain = text.replace(/\*\*(.+?)\*\*/g,'$1').replace(/\*(.+?)\*/g,'$1').replace(/__(.+?)__/g,'$1')
+      .replace(/^#\s?/gm,'').replace(/^-\s?/gm,'• ');
     return plain.split('\n').map(l=>l.trim()).filter(Boolean).join('<br>');
   }
   return dispVal(f, {ignoreToggles:true}).join('<br>');
@@ -1400,7 +1402,10 @@ function getColor(f) {
 
 // ── MAP TAKEAWAY BOX (lightweight markdown + drag, ported from LabelDash's
 // Overall/India box concept) ─────────────────────────────────────────────
-// Splits on **bold** first, then splits each resulting run on __underline__.
+// Splits on **bold** first, then each resulting run on __underline__, then
+// each of those runs on *italic* — bold is parsed first specifically so any
+// single "*" left over afterward can never be a stray half of a "**" pair,
+// making the italic pass unambiguous.
 function parseTakeawaySpans(line) {
   const stage1=[];
   {
@@ -1413,17 +1418,29 @@ function parseTakeawaySpans(line) {
     }
     if (last<line.length || !stage1.length) stage1.push({t:line.slice(last), bold:false});
   }
-  const out=[];
+  const stage2=[];
   stage1.forEach(run=>{
     const re=/__(.+?)__/g;
     let last=0, m, any=false;
     while ((m=re.exec(run.t))) {
       any=true;
-      if (m.index>last) out.push({t:run.t.slice(last,m.index), bold:run.bold, underline:false});
-      out.push({t:m[1], bold:run.bold, underline:true});
+      if (m.index>last) stage2.push({t:run.t.slice(last,m.index), bold:run.bold, underline:false});
+      stage2.push({t:m[1], bold:run.bold, underline:true});
       last=re.lastIndex;
     }
-    if (last<run.t.length || !any) out.push({t:run.t.slice(last), bold:run.bold, underline:false});
+    if (last<run.t.length || !any) stage2.push({t:run.t.slice(last), bold:run.bold, underline:false});
+  });
+  const out=[];
+  stage2.forEach(run=>{
+    const re=/\*(.+?)\*/g;
+    let last=0, m, any=false;
+    while ((m=re.exec(run.t))) {
+      any=true;
+      if (m.index>last) out.push({t:run.t.slice(last,m.index), bold:run.bold, underline:run.underline, italic:false});
+      out.push({t:m[1], bold:run.bold, underline:run.underline, italic:true});
+      last=re.lastIndex;
+    }
+    if (last<run.t.length || !any) out.push({t:run.t.slice(last), bold:run.bold, underline:run.underline, italic:false});
   });
   return out;
 }
@@ -1431,15 +1448,22 @@ function buildTakeawayLines(text, maxChars) {
   const paras = String(text).split('\n');
   const lines = [];
   paras.forEach(para => {
-    let heading=false, p=para;
+    let heading=false, bullet=false, p=para;
     const trimmed=para.replace(/^\s+/,'');
     if (trimmed.startsWith('# ')) { heading=true; p=trimmed.slice(2); }
     else if (trimmed==='#') { heading=true; p=''; }
-    const words = heading
-      ? p.replace(/\*\*/g,'').replace(/__/g,'').split(' ').filter(w=>w!=='').map(w=>({w, bold:true, underline:false}))
-      : parseTakeawaySpans(p).reduce((acc,run)=>{ run.t.split(' ').filter(w=>w!=='').forEach(w=>acc.push({w, bold:run.bold, underline:run.underline})); return acc; }, []);
+    else if (trimmed.startsWith('- ')) { bullet=true; p=trimmed.slice(2); }
+    else if (trimmed==='-') { bullet=true; p=''; }
+    let words = heading
+      ? p.replace(/\*\*/g,'').replace(/__/g,'').replace(/\*/g,'').split(' ').filter(w=>w!=='').map(w=>({w, bold:true, underline:false, italic:false}))
+      : parseTakeawaySpans(p).reduce((acc,run)=>{ run.t.split(' ').filter(w=>w!=='').forEach(w=>acc.push({w, bold:run.bold, underline:run.underline, italic:run.italic})); return acc; }, []);
+    // Bullet is just a plain "•" injected as the paragraph's first token, so
+    // it flows through the same word-wrap/merge logic as everything else —
+    // no hanging indent for wrapped continuation lines, but for the short
+    // one-line takeaway notes this is written for, that's not visible in practice.
+    if (bullet) words = [{w:'•', bold:false, underline:false, italic:false}, ...words];
     const sz = heading ? C.takeawaySz*1.15 : C.takeawaySz;
-    if (!words.length) { lines.push({spans:[{t:'',bold:heading,underline:false}], sz}); return; }
+    if (!words.length) { lines.push({spans:[{t:'',bold:heading,underline:false,italic:false}], sz}); return; }
     let cur=[], curLen=0;
     words.forEach(tok => {
       const addLen = tok.w.length + (cur.length ? 1 : 0);
@@ -1454,8 +1478,8 @@ function buildTakeawayLines(text, maxChars) {
     words.forEach((tok,i) => {
       const piece = (i>0?' ':'') + tok.w;
       const last = spans[spans.length-1];
-      if (last && last.bold===tok.bold && last.underline===tok.underline) last.t += piece;
-      else spans.push({t:piece, bold:tok.bold, underline:tok.underline});
+      if (last && last.bold===tok.bold && last.underline===tok.underline && last.italic===tok.italic) last.t += piece;
+      else spans.push({t:piece, bold:tok.bold, underline:tok.underline, italic:tok.italic});
     });
     if (spans.length && spans[0].t.startsWith(' ')) spans[0].t = spans[0].t.slice(1);
     return {spans, sz};
@@ -1483,6 +1507,7 @@ function renderTakeawayBox(svg, bx, topY, boxW, boxH, lines, pad, baseX, baseY) 
     const textEl = boxG.append('text').attr('x',pad).attr('y',cum+lh*0.75)
       .attr('font-family',"'Segoe UI',sans-serif").attr('fill',C.takeawayTextColor);
     l.spans.forEach(s => textEl.append('tspan').attr('font-size',l.sz).attr('font-weight',s.bold?'700':'400')
+      .attr('font-style', s.italic?'italic':null)
       .attr('text-decoration', s.underline?'underline':null).text(s.t));
     cum += lh;
   });
@@ -1514,17 +1539,25 @@ function annParseSpans(line) {
   { const re=/\*\*(.+?)\*\*/g; let last=0,m;
     while ((m=re.exec(line))) { if (m.index>last) stage1.push({t:line.slice(last,m.index),bold:false}); stage1.push({t:m[1],bold:true}); last=re.lastIndex; }
     if (last<line.length || !stage1.length) stage1.push({t:line.slice(last),bold:false}); }
-  const out=[];
+  const stage2=[];
   stage1.forEach(run=>{
     const re=/__(.+?)__/g; let last=0,m,any=false;
-    while ((m=re.exec(run.t))) { any=true; if (m.index>last) out.push({t:run.t.slice(last,m.index),bold:run.bold,underline:false}); out.push({t:m[1],bold:run.bold,underline:true}); last=re.lastIndex; }
-    if (last<run.t.length || !any) out.push({t:run.t.slice(last),bold:run.bold,underline:false});
+    while ((m=re.exec(run.t))) { any=true; if (m.index>last) stage2.push({t:run.t.slice(last,m.index),bold:run.bold,underline:false}); stage2.push({t:m[1],bold:run.bold,underline:true}); last=re.lastIndex; }
+    if (last<run.t.length || !any) stage2.push({t:run.t.slice(last),bold:run.bold,underline:false});
+  });
+  const out=[];
+  stage2.forEach(run=>{
+    // Single-asterisk italics, parsed last — **bold** pairs were already
+    // consumed above, so any "*" reaching here is never half of one.
+    const re=/\*(.+?)\*/g; let last=0,m,any=false;
+    while ((m=re.exec(run.t))) { any=true; if (m.index>last) out.push({t:run.t.slice(last,m.index),bold:run.bold,underline:run.underline,italic:false}); out.push({t:m[1],bold:run.bold,underline:run.underline,italic:true}); last=re.lastIndex; }
+    if (last<run.t.length || !any) out.push({t:run.t.slice(last),bold:run.bold,underline:run.underline,italic:false});
   });
   return out;
 }
 function annParagraphToWords(para) {
   const words=[];
-  annParseSpans(para).forEach(run=>{ run.t.split(' ').filter(w=>w!=='').forEach(w=>words.push({w,bold:run.bold,underline:run.underline})); });
+  annParseSpans(para).forEach(run=>{ run.t.split(' ').filter(w=>w!=='').forEach(w=>words.push({w,bold:run.bold,underline:run.underline,italic:run.italic})); });
   return words;
 }
 function annWrapText(text, maxChars) {
@@ -1532,13 +1565,19 @@ function annWrapText(text, maxChars) {
   const paras=String(text).split('\n');
   const out=[];
   paras.forEach(para=>{
-    let heading=false, p=para;
+    let heading=false, bullet=false, p=para;
     const trimmed=para.replace(/^\s+/,'');
     if (trimmed.startsWith('# ')) { heading=true; p=trimmed.slice(2); }
     else if (trimmed==='#') { heading=true; p=''; }
-    const words = heading
-      ? p.replace(/\*\*/g,'').replace(/__/g,'').split(' ').filter(w=>w!=='').map(w=>({w,bold:true,underline:false}))
+    else if (trimmed.startsWith('- ')) { bullet=true; p=trimmed.slice(2); }
+    else if (trimmed==='-') { bullet=true; p=''; }
+    let words = heading
+      ? p.replace(/\*\*/g,'').replace(/__/g,'').replace(/\*/g,'').split(' ').filter(w=>w!=='').map(w=>({w,bold:true,underline:false,italic:false}))
       : annParagraphToWords(p);
+    // Bullet is a plain "•" injected as the first token, flowing through the
+    // normal wrap/merge logic — wrapped continuation lines won't hang-indent
+    // under it, but these notes are short enough that this rarely shows.
+    if (bullet) words = [{w:'•', bold:false, underline:false, italic:false}, ...words];
     if (!words.length) { out.push({heading, words:[]}); return; }
     let cur=[], curLen=0;
     words.forEach(tok=>{
@@ -1559,11 +1598,11 @@ function buildAnnTextLines(text, headingSpans) {
     pl.words.forEach((tok,i)=>{
       const piece=(i>0?' ':'')+tok.w;
       const last=spans[spans.length-1];
-      if (last && last.bold===tok.bold && last.underline===tok.underline) last.t+=piece;
-      else spans.push({t:piece,bold:tok.bold,underline:tok.underline});
+      if (last && last.bold===tok.bold && last.underline===tok.underline && last.italic===tok.italic) last.t+=piece;
+      else spans.push({t:piece,bold:tok.bold,underline:tok.underline,italic:tok.italic});
     });
     if (spans.length && spans[0].t.startsWith(' ')) spans[0].t=spans[0].t.slice(1);
-    lines.push({spans: spans.length?spans:[{t:'',bold:pl.heading,underline:false}], sz});
+    lines.push({spans: spans.length?spans:[{t:'',bold:pl.heading,underline:false,italic:false}], sz});
   });
   return lines;
 }
@@ -1620,6 +1659,7 @@ function renderAnnBoxAndText(g, lines, bx, topY, boxW, boxH, anc, textColor, acc
       .attr('fill',textColor).attr('opacity',AC.textOpacity)
       .style('pointer-events', drag ? 'all' : 'none');
     l.spans.forEach(s=>textEl.append('tspan').attr('font-size',l.sz).attr('font-weight',s.bold?'700':'400')
+      .attr('font-style', s.italic?'italic':null)
       .attr('text-decoration', s.underline?'underline':null).text(s.t));
     cum+=lh;
   });
@@ -2356,8 +2396,8 @@ const ANN_OFFSETS_SEED = {
   'Lakshadweep': {dx:-10, dy:-15, noLine:true},
 };
 const ANNOTATIONS_SAMPLE = [
-  ['Maharashtra', 'Example note — replace with your own text.\n**Bold** and __underline__ both work.', 'Group A'],
-  ['Kerala', 'Another example note for this state.', 'Group B'],
+  ['Maharashtra', 'Example note — replace with your own text.\n**Bold**, *italic* and __underline__ all work.', 'Group A'],
+  ['Kerala', 'Another example note for this state.\n- Bullet lines start with "- "\n- Like this one', 'Group B'],
   ['Assam', '# Heading style\nUse a line starting with "# " for a bold heading line.', 'Group A'],
 ];
 // Annotation-only style config (AC), kept separate from C so it never collides

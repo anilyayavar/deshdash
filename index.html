@@ -1768,10 +1768,20 @@ function renderMap() {
   const src=document.getElementById('inp-source').value.trim();
   const note=document.getElementById('inp-note').value.trim();
   const TOP = C.titlePos==='above' ? C.titlePad : 0;
+  // Bivariate's rotated Y-axis label runs alongside the grid's height, not
+  // its width — for a 3x3 grid (~74px tall) a longer axis name (e.g. the
+  // "Sample Metric B" default) is longer than that once laid out, so sizing
+  // this strip to the grid alone let the label swing down past it and
+  // overlap the X-axis label below. Reserve whichever is taller: the grid,
+  // or the label's estimated rendered length (same char-count*fontSize
+  // heuristic used elsewhere in this file for text width, and in
+  // renderBivariateLegend() itself, since real DOM measurement isn't
+  // available yet at this point in the layout pass).
+  const biYLabelLen = VIZ_MODE==='bivariate' ? (biAxisLabelY()+' →').length*11*0.62 : 0;
   const LEGEND_H = VIZ_MODE==='annotations'
     ? ((AC.colorMode==='categorical' && AC.showCatLegend && annCatOrder.length) ? 30 : 0)
     : VIZ_MODE==='bivariate'
-    ? (C.showLegend ? biLegendGeometry(biScale?.n||3).gridH + 34 : 0)
+    ? (C.showLegend ? Math.max(biLegendGeometry(biScale?.n||3).gridH, biYLabelLen) + 40 : 0)
     : (C.showLegend ? 52 : 0);
   const BOT = LEGEND_H + ((src||note)?16:0);
   const H = C.H + TOP + BOT;
@@ -2177,27 +2187,37 @@ function renderBivariateLegend(svg, W, H, BOT, LEGEND_H) {
   const { cell, gap, gridW, gridH } = biLegendGeometry(n);
   const cx=C.legendPos==='left'?80:C.legendPos==='right'?W-80-gridW:(W-gridW)/2;
   const cy=H-BOT+2;
+  const xLabel = biScale.labelX || 'Variable X';
+  const yLabel = biScale.labelY || 'Variable Y';
+  // The rotated Y-axis label runs alongside the grid's HEIGHT, not its width
+  // — a longer axis name (e.g. an uploaded column header, or even the default
+  // "Sample Metric B") is routinely longer than a small 3x3 grid is tall. Give
+  // it its own vertical band sized to whichever is taller, and center both the
+  // grid and the label within that band (anchor='middle', not 'end') so a
+  // long label swings evenly above and below instead of running downward
+  // past the grid and into the X-axis label below it.
+  const yLabelLen = (yLabel+' →').length*11*0.62;
+  const blockH = Math.max(gridH, yLabelLen);
+  const gridTop = cy + (blockH-gridH)/2;
   const lg=svg.append('g').attr('class','legend-g');
   makeLegendDraggable(lg, 'bivariate');
-  lg.append('rect').attr('x',cx-20).attr('y',cy-4).attr('width',gridW+28).attr('height',gridH+22).attr('fill','transparent');
+  lg.append('rect').attr('x',cx-20).attr('y',cy-4).attr('width',gridW+28).attr('height',blockH+28).attr('fill','transparent');
   for (let row=0; row<n; row++) {       // row 0 = Y high (top) .. row n-1 = Y low (bottom)
     for (let col=0; col<n; col++) {     // col 0 = X low (left) .. col n-1 = X high (right)
       const yIdx=n-1-row;
       lg.append('rect')
-        .attr('x', cx+col*(cell+gap)).attr('y', cy+row*(cell+gap))
+        .attr('x', cx+col*(cell+gap)).attr('y', gridTop+row*(cell+gap))
         .attr('width', cell).attr('height', cell)
         .attr('fill', biScale.matrix[yIdx][col]).attr('stroke','#fff').attr('stroke-width',0.5);
     }
   }
-  const xLabel = biScale.labelX || 'Variable X';
-  const yLabel = biScale.labelY || 'Variable Y';
-  lg.append('text').attr('x', cx+gridW/2).attr('y', cy+gridH+14)
+  lg.append('text').attr('x', cx+gridW/2).attr('y', cy+blockH+20)
     .attr('text-anchor','middle').attr('font-size',11).attr('font-weight',600).attr('fill','#444')
     .attr('font-family',"'Segoe UI',sans-serif").text(xLabel+' →');
-  lg.append('text').attr('x', cx-8).attr('y', cy+gridH/2)
-    .attr('text-anchor','end').attr('font-size',11).attr('font-weight',600).attr('fill','#444')
+  lg.append('text').attr('x', cx-8).attr('y', cy+blockH/2)
+    .attr('text-anchor','middle').attr('font-size',11).attr('font-weight',600).attr('fill','#444')
     .attr('font-family',"'Segoe UI',sans-serif")
-    .attr('transform', `rotate(-90, ${cx-8}, ${cy+gridH/2})`).text(yLabel+' →');
+    .attr('transform', `rotate(-90, ${cx-8}, ${cy+blockH/2})`).text(yLabel+' →');
 }
 
 // ── LEGEND ─────────────────────────────────────────────────────────────────

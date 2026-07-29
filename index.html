@@ -20,7 +20,18 @@
 body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; height: 100vh; overflow: hidden; background: #eef0f4; color: #1a1a2e; }
 
 /* ─── PANEL ─── */
-#panel { width: 420px; min-width: 360px; background: #1a1a2e; display: flex; flex-direction: column; overflow: hidden; box-shadow: 3px 0 14px rgba(0,0,0,0.35); z-index: 10; }
+#panel { width: 420px; min-width: 360px; flex: 0 0 420px; background: #1a1a2e; display: flex; flex-direction: column; overflow: hidden; box-shadow: 3px 0 14px rgba(0,0,0,0.35); z-index: 10; }
+#panel.collapsed { width: 0; min-width: 0; flex-basis: 0; box-shadow: none; }
+#btn-panel-toggle {
+  position: fixed; top: 14px; left: 420px; transform: translateX(-50%);
+  width: 36px; height: 36px; border: none; border-radius: 8px;
+  background: #1a1a2e; cursor: pointer;
+  z-index: 20; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.35); transition: left 0.18s ease;
+}
+#btn-panel-toggle:hover { background: #2a2a4a; }
+#btn-panel-toggle .hbar { width: 13px; height: 2px; background: #8aabff; border-radius: 1px; transition: background 0.15s ease; }
+#btn-panel-toggle:hover .hbar { background: #b8caff; }
 #panel-header { padding: 14px 16px 10px; background: #0f0f1e; border-bottom: 1px solid #2a2a4a; }
 #panel-header h1 { font-size: 14px; font-weight: 700; color: #e0e4f0; letter-spacing: 0.3px; }
 #panel-header p { font-size: 10px; color: #6a6f90; margin-top: 2px; }
@@ -133,7 +144,6 @@ input[type=checkbox] { accent-color: var(--accent); width: 14px; height: 14px; c
   <div id="panel-header" style="position:relative">
     <h1>DeshDash <span style="font-size:11px;font-weight:700;color:#8aabff;background:#1a1a3a;border:1px solid #3a4a7a;border-radius:10px;padding:2px 8px;vertical-align:middle;letter-spacing:0.3px">v2</span></h1>
     <p>Build state-wise choropleth maps of India — labels, legends, and export in one tool</p>
-    <a href="help/" target="_blank" rel="noopener" style="position:absolute;top:0;right:0;font-size:11px;color:#8aabff;text-decoration:none;border:1px solid #3a4a7a;border-radius:12px;padding:3px 10px;background:#1a1a3a">❓ Help</a>
   </div>
   <div id="viztype-bar">
     <button class="viztype-btn active" data-viztype="univariate">Univariate</button>
@@ -721,9 +731,14 @@ input[type=checkbox] { accent-color: var(--accent); width: 14px; height: 14px; c
   <div id="status">Ready — enter data then click Generate Map</div>
   <div id="app-signature" style="text-align:center;padding:6px 10px;font-size:10px;color:#6a6f90;background:#0f0f1e;border-top:1px solid #2a2a4a">
     Developed by <strong style="color:#8aabff">Anil Kumar Goyal</strong> &middot;
-    <a href="https://www.linkedin.com/in/anil-kumar-goyal/" target="_blank" rel="noopener" style="color:#8aabff;text-decoration:none">LinkedIn</a>
+    <a href="https://www.linkedin.com/in/anil-kumar-goyal/" target="_blank" rel="noopener" style="color:#8aabff;text-decoration:none">LinkedIn</a> &middot;
+    <a href="help/index.html" target="_blank" rel="noopener" style="color:#8aabff;text-decoration:none">❓ Help</a>
   </div>
 </div>
+
+<button id="btn-panel-toggle" title="Collapse panel">
+  <span class="hbar"></span><span class="hbar"></span><span class="hbar"></span>
+</button>
 
 <div id="map-area">
   <div id="map-container">
@@ -3244,6 +3259,25 @@ function applyTheme(mode) {
 function init() {
   buildGrids();  // populate color-scheme swatches on startup
   applyTheme(VIZ_MODE);  // paint the default (Univariate) theme before first interaction
+
+  // Whole-panel collapse toggle — separate from the per-section collapsible
+  // headings already inside the panel; this hides the entire control column
+  // so the map can be viewed or presented full-width. State is remembered
+  // across reloads via localStorage.
+  (function initPanelToggle() {
+    const panelEl = document.getElementById('panel');
+    const btn = document.getElementById('btn-panel-toggle');
+    function setCollapsed(collapsed) {
+      panelEl.classList.toggle('collapsed', collapsed);
+      btn.style.left = collapsed ? '0px' : '420px';
+      btn.title = collapsed ? 'Expand panel' : 'Collapse panel';
+      try { localStorage.setItem('deshdash-panel-collapsed', collapsed ? '1' : '0'); } catch (e) {}
+    }
+    btn.addEventListener('click', () => setCollapsed(!panelEl.classList.contains('collapsed')));
+    let restored = false;
+    try { restored = localStorage.getItem('deshdash-panel-collapsed') === '1'; } catch (e) {}
+    setCollapsed(restored);
+  })();
 
   // Viz type selector (Univariate / Bivariate / Categorical / Annotations)
   document.querySelectorAll('.viztype-btn').forEach(b=>b.addEventListener('click',()=>{

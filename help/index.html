@@ -367,6 +367,7 @@ footer { text-align: center; padding: 20px; font-size: 11px; color: #8991a3; }
       <tr><td>Categorical Colors</td><td><b>Palette</b> (Set2 / Dark2 / Paired / Pastel2 — ColorBrewer qualitative sets chosen so adjacent colors stay visually distinct).</td></tr>
       <tr><td>Distinct-color cap</td><td><b>Distinct colors before grouping into "Other"</b> — adjustable from 3 up to 8 (default 7; 8 is the ceiling because each palette only has 8 distinguishable hues). The categories covering the <i>most states</i> get their own color, in that order — not whichever appeared first in your data — so the cap always keeps the categories that matter most to the map.</td></tr>
       <tr><td>"Other" swatch</td><td>Categories beyond the cap are grouped into one gray <b>"Other"</b> swatch, with its own color picker here — useful if a palette's own last color sits too close to the default Other gray to tell apart. The legend's <code>Other (N)</code> label counts <i>states</i>, not how many category names got merged.</td></tr>
+      <tr><td>Legend layout</td><td><b>Horizontal</b> (default, one row), <b>Vertical</b> (one column), or <b>Grid</b> (pick 2/3/4 columns). Horizontal is compact but can run wide with several categories or long names; Vertical/Grid stack entries instead. Any label over ~14 characters wraps to a second line automatically in all layouts.</td></tr>
       <tr><td>Other Colors / Legend / Map Takeaway</td><td>Same controls as Univariate. <b>Color Scale Type</b> and <b>Scale Range</b> are hidden — there's no numeric scale to configure.</td></tr>
     </table>
 
@@ -406,7 +407,7 @@ footer { text-align: center; padding: 20px; font-size: 11px; color: #8991a3; }
 
     <h3>Style tab</h3>
     <table class="ctl wide">
-      <tr><td>Annotation Fill — Color mode</td><td><b>Distinct per state</b> (default): every annotated state gets its own palette color. <b>Single color</b>: every annotated state shares one flat color you pick — use when the color itself carries no meaning. <b>Categorical (by Group)</b>: colors follow the Group column, with a <b>Show group legend on map</b> toggle.</td></tr>
+      <tr><td>Annotation Fill — Color mode</td><td><b>Distinct per state</b> (default): every annotated state gets its own palette color. <b>Single color</b>: every annotated state shares one flat color you pick — use when the color itself carries no meaning. <b>Categorical (by Group)</b>: colors follow the Group column, with a <b>Show group legend on map</b> toggle and the same <b>Legend layout</b> choice (Horizontal/Vertical/Grid) as Categorical mode — Horizontal here auto-wraps to a new row instead of running off the map.</td></tr>
       <tr><td>Palette</td><td>Set2/Dark2/Paired/Pastel2 (ColorBrewer qualitative), used in Distinct and Categorical modes.</td></tr>
       <tr><td>No-data fill</td><td>Fill color for states with no note.</td></tr>
       <tr><td>Legend</td><td>Hidden in this mode — the "Show group legend on map" toggle above replaces it when using Categorical-by-Group coloring.</td></tr>

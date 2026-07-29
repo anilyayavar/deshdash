@@ -464,6 +464,21 @@ input[type=checkbox] { accent-color: var(--accent); width: 14px; height: 14px; c
         <label class="cl" style="margin-top:10px">"Other" swatch color</label>
         <div class="cpw"><input type="color" id="clr-cat-other" value="#b0b0b0"><span>Grouped/rare categories</span></div>
         <div class="exp-desc" style="margin-top:4px">Some palettes' last color is a similar gray to the default here — if the two look too close together in the legend, change one of them.</div>
+        <label class="cl" style="margin-top:10px">Legend layout</label>
+        <select id="sel-cat-legend-layout" style="width:100%;padding:4px 6px;border:1px solid #c8cedf;border-radius:5px;font-size:12px;background:#fff">
+          <option value="horizontal" selected>Horizontal (one row)</option>
+          <option value="vertical">Vertical (one column)</option>
+          <option value="grid">Grid</option>
+        </select>
+        <div id="cat-legend-cols-row" style="display:none">
+          <label class="cl" style="margin-top:8px">Grid columns</label>
+          <select id="sel-cat-legend-cols" style="width:100%;padding:4px 6px;border:1px solid #c8cedf;border-radius:5px;font-size:12px;background:#fff">
+            <option value="2" selected>2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+          </select>
+        </div>
+        <div class="exp-desc" style="margin-top:4px">Horizontal keeps the legend compact but can run wide with many categories or long names. Vertical/Grid stack entries instead — labels over ~14 characters wrap to a second line.</div>
         <div class="exp-desc" style="margin-top:4px">Type a category per state in the Data tab (e.g. dominant crop, scheme type, region class). The categories covering the <b>most states</b> keep their own color, up to the limit above; rarer ones share a gray "Other" swatch — the legend tells you how many states that covers, not how many category names got merged.<br><br><b>Why the dropdown stops at 8:</b> each palette (Set2/Dark2/Paired/Pastel2) ships exactly 8 distinguishable hues. Choosing a higher limit isn't possible here — it would force two "kept" categories to silently reuse the same color, which defeats the purpose of keeping them separate.</div>
       </div>
       <div class="sl" id="sl-ann-fill" style="display:none">Annotation Fill</div>
@@ -485,6 +500,20 @@ input[type=checkbox] { accent-color: var(--accent); width: 14px; height: 14px; c
         </div>
         <div id="ann-cat-legend-opts" style="display:none">
           <div class="tr" style="margin-top:2px"><span>Show group legend on map</span><input type="checkbox" id="ann-chk-cat-legend" checked></div>
+          <label class="cl" style="margin-top:8px">Legend layout</label>
+          <select id="sel-ann-legend-layout" style="width:100%;padding:4px 6px;border:1px solid #c8cedf;border-radius:5px;font-size:12px;background:#fff">
+            <option value="horizontal" selected>Horizontal (wraps automatically)</option>
+            <option value="vertical">Vertical (one column)</option>
+            <option value="grid">Grid</option>
+          </select>
+          <div id="ann-legend-cols-row" style="display:none">
+            <label class="cl" style="margin-top:8px">Grid columns</label>
+            <select id="sel-ann-legend-cols" style="width:100%;padding:4px 6px;border:1px solid #c8cedf;border-radius:5px;font-size:12px;background:#fff">
+              <option value="2" selected>2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+            </select>
+          </div>
         </div>
         <div id="ann-single-fill-opts" style="display:none">
           <label class="cl">Fill color — states with a note</label>
@@ -1232,18 +1261,90 @@ function getCategoricalColor(f) {
   const t = String(v).trim();
   return catScale.colorMap[t] || catScale.otherColor;  // beyond the cap -> shared "Other" color
 }
+// ── SWATCH LEGEND LAYOUT (shared: Categorical, Annotations-by-Group) ───────
+// Both legends are a list of {color, label} chips. The default is a single
+// horizontal row (unchanged below) but that gets wide fast with several
+// categories or long names, so Vertical (one column) and Grid (N columns)
+// are also available. This part is shared so "vertical/grid" behaves
+// identically in both places instead of two near-duplicate implementations.
+// Word-wraps (never mid-word) any label over lineChars to a 2nd line, so one
+// long category name doesn't blow out the column width for every other item
+// in its column.
+function legendWrapLabel(text, lineChars=14) {
+  const t = String(text).trim();
+  if (t.length<=lineChars) return [t];
+  const words = t.split(' ');
+  if (words.length===1) return [t];  // one long token — nothing sensible to break on
+  let line1='', i=0;
+  while (i<words.length) {
+    const test = line1 ? line1+' '+words[i] : words[i];
+    if (!line1 || test.length<=lineChars) { line1=test; i++; } else break;
+  }
+  const line2 = words.slice(i).join(' ');
+  return line2 ? [line1, line2] : [line1];
+}
+// Row height is fixed at "2-line capable" regardless of whether a given
+// label actually wraps, so every row lines up — simpler and safer than
+// variable-height rows, at the cost of a little unused space next to
+// single-line entries.
+function computeStackedLegendLayout(labels, cols, sw) {
+  const wrapped = labels.map(l=>legendWrapLabel(l));
+  const nCols = Math.max(1, cols);
+  const nRows = Math.ceil(labels.length/nCols);
+  const gapX=14, rowH=26;
+  const colWidths = [];
+  for (let c=0;c<nCols;c++) {
+    let maxW=30;
+    for (let r=0;r<nRows;r++) {
+      const idx=r*nCols+c;
+      if (idx>=labels.length) continue;
+      const w = sw+4+Math.max(...wrapped[idx].map(l=>l.length))*6.2;
+      if (w>maxW) maxW=w;
+    }
+    colWidths.push(maxW);
+  }
+  const totalW = colWidths.reduce((a,b)=>a+b,0) + gapX*(nCols-1);
+  const totalH = nRows*rowH;
+  return { wrapped, nCols, nRows, colWidths, gapX, rowH, totalW, totalH };
+}
+function drawStackedLegendItems(lg, labels, colors, geom, lx, ly, sw, fontSize, rx) {
+  const { wrapped, nCols, colWidths, gapX, rowH } = geom;
+  labels.forEach((label,idx)=>{
+    const r=Math.floor(idx/nCols), c=idx%nCols;
+    let colX=lx; for (let k=0;k<c;k++) colX+=colWidths[k]+gapX;
+    const rowY=ly+r*rowH;
+    lg.append('rect').attr('x',colX).attr('y',rowY+2).attr('width',sw).attr('height',sw)
+      .attr('rx',rx||0).attr('fill',colors[idx]).attr('stroke','#fff').attr('stroke-width',0.5);
+    wrapped[idx].forEach((ln,li)=>{
+      lg.append('text').attr('x',colX+sw+4).attr('y',rowY+11+li*11)
+        .attr('font-size',fontSize).attr('fill','#444').attr('font-family',"'Segoe UI',sans-serif")
+        .text(ln);
+    });
+  });
+}
 function renderCategoricalLegend(svg, W, H, BOT, LEGEND_H) {
   if (!C.showLegend||!catScale||LEGEND_H===0) return;
   const labels = catScale.categories.slice();
   const colors = labels.map(c=>catScale.colorMap[c]);
   if (catScale.overflowCount>0) { labels.push(`Other (${catScale.overflowCount})`); colors.push(catScale.otherColor); }
+  const layoutMode = document.getElementById('sel-cat-legend-layout')?.value || 'horizontal';
+  const lg=svg.append('g').attr('class','legend-g');
+  makeLegendDraggable(lg, 'categorical');
+  if (layoutMode!=='horizontal') {
+    const cols = layoutMode==='grid' ? Math.max(2, Math.min(4, parseInt(document.getElementById('sel-cat-legend-cols')?.value,10)||2)) : 1;
+    const sw=13;
+    const geom = computeStackedLegendLayout(labels, cols, sw);
+    const lx=C.legendPos==='left'?80:C.legendPos==='right'?W-80-geom.totalW:(W-geom.totalW)/2;
+    const ly=H-BOT+10;
+    lg.append('rect').attr('x',lx-4).attr('y',ly-4).attr('width',geom.totalW+8).attr('height',geom.totalH+8).attr('fill','transparent');
+    drawStackedLegendItems(lg, labels, colors, geom, lx, ly, sw, 10, 0);
+    return;
+  }
   const sw=14, gap=8;
   const widths = labels.map(t => sw+4+Math.max(30, t.length*6.2)+gap);
   const totalW = widths.reduce((a,b)=>a+b,0) - gap;
   const lx=C.legendPos==='left'?80:C.legendPos==='right'?W-80-totalW:(W-totalW)/2;
   const ly=H-BOT+14;
-  const lg=svg.append('g').attr('class','legend-g');
-  makeLegendDraggable(lg, 'categorical');
   lg.append('rect').attr('x',lx-4).attr('y',ly-4).attr('width',totalW+8).attr('height',sw+8).attr('fill','transparent');
   let x=lx;
   labels.forEach((label,i)=>{
@@ -1721,7 +1822,16 @@ function renderAnnCategoryLegend(svg, W, H, LEGEND_H, order) {
   if (!LEGEND_H || !order || !order.length) return;
   const g=svg.append('g').attr('class','legend-g');
   makeLegendDraggable(g, 'annotations');
-  const sw=11, gap=6, rowH=16;
+  const layoutMode = document.getElementById('sel-ann-legend-layout')?.value || 'horizontal';
+  if (layoutMode!=='horizontal') {
+    const cols = layoutMode==='grid' ? Math.max(2, Math.min(4, parseInt(document.getElementById('sel-ann-legend-cols')?.value,10)||2)) : 1;
+    const sw=11;
+    const colors = order.map(name=>annGroupColorMap[name]);
+    const geom = computeStackedLegendLayout(order, cols, sw);
+    drawStackedLegendItems(g, order, colors, geom, 80, H-LEGEND_H+6, sw, 10.5, 2);
+    return;
+  }
+  const sw=11, rowH=16;
   let x=80, y=H-LEGEND_H+6;
   order.forEach(name=>{
     const textW=name.length*6.2;
@@ -1778,10 +1888,26 @@ function renderMap() {
   // renderBivariateLegend() itself, since real DOM measurement isn't
   // available yet at this point in the layout pass).
   const biYLabelLen = VIZ_MODE==='bivariate' ? (biAxisLabelY()+' →').length*11*0.62 : 0;
+  // Vertical/Grid swatch-legend layouts (Categorical, Annotations-by-Group)
+  // need a taller reserved strip as row count grows — Horizontal keeps the
+  // original flat heights (30/52) since it's still a single row (Categorical)
+  // or already handles its own row count via wrapping (Annotations).
+  const catLegendLayout = VIZ_MODE==='categorical' ? (document.getElementById('sel-cat-legend-layout')?.value||'horizontal') : 'horizontal';
+  const catLegendRows = (catLegendLayout!=='horizontal' && catScale)
+    ? Math.ceil((catScale.categories.length + (catScale.overflowCount>0?1:0)) / Math.max(1, catLegendLayout==='grid' ? (parseInt(document.getElementById('sel-cat-legend-cols')?.value,10)||2) : 1))
+    : 0;
+  const annLegendLayout = VIZ_MODE==='annotations' ? (document.getElementById('sel-ann-legend-layout')?.value||'horizontal') : 'horizontal';
+  const annLegendRows = (annLegendLayout!=='horizontal' && annCatOrder.length)
+    ? Math.ceil(annCatOrder.length / Math.max(1, annLegendLayout==='grid' ? (parseInt(document.getElementById('sel-ann-legend-cols')?.value,10)||2) : 1))
+    : 0;
   const LEGEND_H = VIZ_MODE==='annotations'
-    ? ((AC.colorMode==='categorical' && AC.showCatLegend && annCatOrder.length) ? 30 : 0)
+    ? ((AC.colorMode==='categorical' && AC.showCatLegend && annCatOrder.length)
+        ? (annLegendRows ? annLegendRows*26+16 : 30)
+        : 0)
     : VIZ_MODE==='bivariate'
     ? (C.showLegend ? Math.max(biLegendGeometry(biScale?.n||3).gridH, biYLabelLen) + 35 : 0)
+    : VIZ_MODE==='categorical'
+    ? (C.showLegend ? (catLegendRows ? catLegendRows*26+16 : 52) : 0)
     : (C.showLegend ? 52 : 0);
   const BOT = LEGEND_H + ((src||note)?16:0);
   const H = C.H + TOP + BOT;
@@ -3092,6 +3218,10 @@ function exportProject() {
     catPalette: document.getElementById('sel-cat-palette')?.value || 'Set2',
     catMax: document.getElementById('sel-cat-max')?.value || '7',
     catOtherColor: document.getElementById('clr-cat-other')?.value || CATEGORICAL_OTHER_COLOR,
+    catLegendLayout: document.getElementById('sel-cat-legend-layout')?.value || 'horizontal',
+    catLegendCols: document.getElementById('sel-cat-legend-cols')?.value || '2',
+    annLegendLayout: document.getElementById('sel-ann-legend-layout')?.value || 'horizontal',
+    annLegendCols: document.getElementById('sel-ann-legend-cols')?.value || '2',
     biGrid: document.getElementById('sel-bi-grid')?.value || '3',
     biColX: lastBiColX, biColY: lastBiColY,
     biCorners: {...BIVARIATE_CORNERS},
@@ -3137,6 +3267,22 @@ function importProject(data) {
   if (data.catOtherColor) {
     const inp=document.getElementById('clr-cat-other');
     if (inp) inp.value = data.catOtherColor;
+  }
+  if (data.catLegendLayout) {
+    const sel=document.getElementById('sel-cat-legend-layout');
+    if (sel) { sel.value = data.catLegendLayout; document.getElementById('cat-legend-cols-row').style.display = data.catLegendLayout==='grid' ? '' : 'none'; }
+  }
+  if (data.catLegendCols) {
+    const sel=document.getElementById('sel-cat-legend-cols');
+    if (sel) sel.value = data.catLegendCols;
+  }
+  if (data.annLegendLayout) {
+    const sel=document.getElementById('sel-ann-legend-layout');
+    if (sel) { sel.value = data.annLegendLayout; document.getElementById('ann-legend-cols-row').style.display = data.annLegendLayout==='grid' ? '' : 'none'; }
+  }
+  if (data.annLegendCols) {
+    const sel=document.getElementById('sel-ann-legend-cols');
+    if (sel) sel.value = data.annLegendCols;
   }
   if (data.biGrid) {
     const sel=document.getElementById('sel-bi-grid');
@@ -3572,6 +3718,16 @@ function init() {
   document.getElementById('sel-cat-palette').addEventListener('change', liveRender);
   document.getElementById('sel-cat-max').addEventListener('change', liveRender);
   document.getElementById('clr-cat-other').addEventListener('input', liveRender);
+  document.getElementById('sel-cat-legend-layout').addEventListener('change', e=>{
+    document.getElementById('cat-legend-cols-row').style.display = e.target.value==='grid' ? '' : 'none';
+    liveRender();
+  });
+  document.getElementById('sel-cat-legend-cols').addEventListener('change', liveRender);
+  document.getElementById('sel-ann-legend-layout').addEventListener('change', e=>{
+    document.getElementById('ann-legend-cols-row').style.display = e.target.value==='grid' ? '' : 'none';
+    liveRender();
+  });
+  document.getElementById('sel-ann-legend-cols').addEventListener('change', liveRender);
 
   // Bivariate — Data tab: grid size, names/format, separator
   document.getElementById('sel-bi-grid').addEventListener('change', liveRender);

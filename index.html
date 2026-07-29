@@ -1781,7 +1781,7 @@ function renderMap() {
   const LEGEND_H = VIZ_MODE==='annotations'
     ? ((AC.colorMode==='categorical' && AC.showCatLegend && annCatOrder.length) ? 30 : 0)
     : VIZ_MODE==='bivariate'
-    ? (C.showLegend ? Math.max(biLegendGeometry(biScale?.n||3).gridH, biYLabelLen) + 40 : 0)
+    ? (C.showLegend ? Math.max(biLegendGeometry(biScale?.n||3).gridH, biYLabelLen) + 35 : 0)
     : (C.showLegend ? 52 : 0);
   const BOT = LEGEND_H + ((src||note)?16:0);
   const H = C.H + TOP + BOT;
@@ -2201,7 +2201,7 @@ function renderBivariateLegend(svg, W, H, BOT, LEGEND_H) {
   const gridTop = cy + (blockH-gridH)/2;
   const lg=svg.append('g').attr('class','legend-g');
   makeLegendDraggable(lg, 'bivariate');
-  lg.append('rect').attr('x',cx-20).attr('y',cy-4).attr('width',gridW+28).attr('height',blockH+28).attr('fill','transparent');
+  lg.append('rect').attr('x',cx-20).attr('y',cy-4).attr('width',gridW+28).attr('height',blockH+30).attr('fill','transparent');
   for (let row=0; row<n; row++) {       // row 0 = Y high (top) .. row n-1 = Y low (bottom)
     for (let col=0; col<n; col++) {     // col 0 = X low (left) .. col n-1 = X high (right)
       const yIdx=n-1-row;
@@ -2211,7 +2211,12 @@ function renderBivariateLegend(svg, W, H, BOT, LEGEND_H) {
         .attr('fill', biScale.matrix[yIdx][col]).attr('stroke','#fff').attr('stroke-width',0.5);
     }
   }
-  lg.append('text').attr('x', cx+gridW/2).attr('y', cy+blockH+20)
+  // Anchored to the GRID's own bottom edge (not the taller band) so the gap
+  // stays a small constant regardless of how long the Y-label is — verified
+  // this still clears the Y-label's own bottom edge (which sits at cy+blockH)
+  // by several px even for a much-longer-than-grid label, since that label's
+  // bottom overhang below the grid is capped at (blockH-gridH)/2.
+  lg.append('text').attr('x', cx+gridW/2).attr('y', gridTop+gridH+28)
     .attr('text-anchor','middle').attr('font-size',11).attr('font-weight',600).attr('fill','#444')
     .attr('font-family',"'Segoe UI',sans-serif").text(xLabel+' →');
   lg.append('text').attr('x', cx-8).attr('y', cy+blockH/2)

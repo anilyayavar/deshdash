@@ -3265,7 +3265,7 @@ function wireRange(id,lblId) {
 const VIZTYPE_NOTICES = {
   univariate: 'One number per state (e.g. beneficiary count), shown as a single color scale. Color scale is in the Style tab; label appearance is in the Labels tab.',
   bivariate: 'Two numbers per state shown together as one color grid (e.g. Coverage × Leakage) — not two separate maps. Grid size and colors are in the Style tab → "Bivariate Grid & Colors"; label appearance is in the Labels tab.',
-  categorical: 'One category per state (e.g. dominant crop, scheme type) — not a number, so nothing gets binned into ranges. Color palette is in the Style tab → "Categorical Colors"; label appearance is in the Labels tab.',
+  categorical: 'One category per state (e.g. dominant crop, scheme type) — not a number, so nothing gets binned into ranges. Up to 8 categories (the most prevalent ones) get their own color; any rest share a 9th, gray "Other" swatch — set the limit in the Style tab → "Categorical Colors"; label appearance is in the Labels tab.',
   annotations: 'Free-text notes per state, not tied to any number. Colors/groups are in the Style tab, note text/box style are in the Labels tab, and you can drag any note directly on the map to reposition it.',
 };
 

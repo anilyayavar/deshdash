@@ -47,7 +47,7 @@ body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: fl
 .viztype-btn { flex: 1; padding: 7px 4px; font-size: 11px; font-weight: 700; color: #8890b8; background: #1e1e3a; border: 1px solid #2f2f55; border-radius: 6px; cursor: pointer; letter-spacing: 0.2px; transition: all 0.15s; }
 .viztype-btn:hover { color: #c0c6ea; border-color: #4a4a80; }
 .viztype-btn.active { color: var(--accent-text-on-accent); background: var(--accent); border-color: var(--accent); transition: background 0.25s, border-color 0.25s, color 0.25s; }
-#viztype-notice { margin: 8px 14px 0; padding: 8px 10px; background: #2a2410; border: 1px solid #6a5a20; border-radius: 6px; font-size: 11px; color: #d9c680; line-height: 1.5; }
+#viztype-notice { margin: 8px 14px 0; padding: 8px 10px; background: #1a1a3a; border: 1px solid var(--accent); border-left-width: 3px; border-radius: 6px; font-size: 11px; color: var(--accent); line-height: 1.5; transition: color 0.25s, border-color 0.25s; }
 #panel-body { flex: 1; overflow-y: auto; overflow-x: hidden; }
 #panel-body::-webkit-scrollbar { width: 4px; }
 #panel-body::-webkit-scrollbar-thumb { background: #3a3a5a; border-radius: 2px; }
@@ -99,6 +99,8 @@ textarea { resize: vertical; min-height: 72px; font-family: monospace; font-size
 #annotations-table input:focus, #annotations-table textarea:focus { background: #0f0f1e; border-radius: 3px; outline: 1px solid var(--accent); }
 #match-info { font-size: 10.5px; color: #6a6a8a; padding: 5px 0; display: none; }
 #match-info.vis { display: block; }
+.data-warn { font-size: 10px; color: #d9a441; background: #2a2010; border: 1px solid #4a3a10; border-radius: 4px; padding: 5px 8px; margin: 0 0 8px; line-height: 1.5; }
+.data-warn b { color: #f0c060; }
 #csv-panel { display: none; }
 .fi-wrap { position: relative; display: inline-block; }
 .fi-wrap input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; }
@@ -161,7 +163,9 @@ input[type=checkbox] { accent-color: var(--accent); width: 14px; height: 14px; c
   <div id="panel-header" style="position:relative">
     <h1>DeshDash <span style="font-size:11px;font-weight:700;color:#8aabff;background:#1a1a3a;border:1px solid #3a4a7a;border-radius:10px;padding:2px 8px;vertical-align:middle;letter-spacing:0.3px">v2</span></h1>
     <p>Build state-wise choropleth maps of India — labels, legends, and export in one tool</p>
+    <a href="help/index.html" target="_blank" rel="noopener" style="position:absolute;top:14px;right:16px;font-size:11px;font-weight:700;color:#8aabff;text-decoration:none;border:1px solid #3a4a7a;border-radius:12px;padding:4px 11px;background:#1a1a3a">&#10067; Help</a>
   </div>
+  <div class="data-warn" style="margin:0 14px 8px"><b>&#9888; Needs one row per state, already aggregated.</b> DeshDash plots what you give it — it doesn't sum, average, or merge duplicate rows for you. If your source has multiple rows per state (e.g. district-level data), combine them first.</div>
   <div id="viztype-bar">
     <button class="viztype-btn active" data-viztype="univariate">Univariate</button>
     <button class="viztype-btn" data-viztype="bivariate">Bivariate</button>
@@ -781,8 +785,7 @@ input[type=checkbox] { accent-color: var(--accent); width: 14px; height: 14px; c
   <div id="status">Ready — enter data then click Generate Map</div>
   <div id="app-signature" style="text-align:center;padding:6px 10px;font-size:10px;color:#6a6f90;background:#0f0f1e;border-top:1px solid #2a2a4a">
     Developed by <strong style="color:#8aabff">Anil Kumar Goyal</strong> &middot;
-    <a href="https://www.linkedin.com/in/anil-kumar-goyal/" target="_blank" rel="noopener" style="color:#8aabff;text-decoration:none">LinkedIn</a> &middot;
-    <a href="help/index.html" target="_blank" rel="noopener" style="color:#8aabff;text-decoration:none">❓ Help</a>
+    <a href="https://www.linkedin.com/in/anil-kumar-goyal/" target="_blank" rel="noopener" style="color:#8aabff;text-decoration:none">LinkedIn</a>
   </div>
 </div>
 
@@ -2483,6 +2486,18 @@ function setValueColumnMode(isCategorical) {
   });
 }
 
+// Rows that resolve to the same canonical state silently overwrite each
+// other (last one wins) in both userData and annotations — the exact
+// "pasted disaggregated data" mistake the Data-tab disclaimer warns about.
+// Builds the shared "which states collided" warning line so users see it
+// happen instead of just getting a wrong-looking map.
+function dupeWarningHTML(cnCounts, stateNames) {
+  const dupes = Object.entries(cnCounts).filter(([,n]) => n>1);
+  if (!dupes.length) return '';
+  const label = dupes.map(([cn,n]) => `${stateNames[cn]||cn} (×${n})`).join(', ');
+  const plural = dupes.length>1 ? 's have' : ' has';
+  return `<br><span style="color:#e0a840">&#9888; ${dupes.length} state${plural} multiple rows — only the last is used: ${label}. Aggregate duplicates before pasting.</span>`;
+}
 function compileData() {
   userData={};
   userDataY={};
@@ -2492,6 +2507,7 @@ function compileData() {
   // that no longer has any data.
   stateNames={};
   let matched=0, total=0;
+  const cnCounts={};
   document.querySelectorAll('#tbody tr').forEach(tr=>{
     const sEl=tr.querySelector('.s'), vEl=tr.querySelector('.v'), v2El=tr.querySelector('.v2'), dot=tr.querySelector('.mdot');
     if (!sEl) return;
@@ -2499,6 +2515,7 @@ function compileData() {
     if (!s) { if(dot) dot.className='mdot m-warn'; return; }
     total++;
     const cn=canon(s);
+    cnCounts[cn]=(cnCounts[cn]||0)+1;
     stateNames[cn]=s;
     // Categorical stores the typed category text as-is (a state's "value" is
     // a name like "Rice", not a number) — every other mode parses it numeric.
@@ -2514,7 +2531,7 @@ function compileData() {
     }
   });
   const mi=document.getElementById('match-info');
-  if (total>0) mi.textContent=`${matched} of ${total} states matched`;
+  if (total>0) mi.innerHTML=`${matched} of ${total} states matched` + dupeWarningHTML(cnCounts, stateNames);
   mi.classList.toggle('vis', total>0);
   const withVals = VIZ_MODE==='categorical'
     ? Object.values(userData).filter(v=>v!==null&&v!=='').length
@@ -2676,6 +2693,7 @@ function compileAnnotations() {
   annotationGroups={};
   stateNames={};  // rebuilt from this table only — see compileData()'s comment
   let matched=0, total=0;
+  const cnCounts={};
   document.querySelectorAll('#ann-tbody tr').forEach(tr=>{
     const sEl=tr.querySelector('.as'), tEl=tr.querySelector('.at'), gEl=tr.querySelector('.ag'), dot=tr.querySelector('.mdot');
     if (!sEl) return;
@@ -2683,6 +2701,7 @@ function compileAnnotations() {
     if (!s) { if(dot) dot.className='mdot m-warn'; return; }
     total++;
     const cn=canon(s);
+    cnCounts[cn]=(cnCounts[cn]||0)+1;
     stateNames[cn]=s;
     annotations[cn]=t;
     annotationGroups[cn]=grp||null;
@@ -2694,7 +2713,7 @@ function compileAnnotations() {
   });
   const mi=document.getElementById('ann-match-info');
   if (mi) {
-    if (total>0) mi.textContent=`${matched} of ${total} states matched`;
+    if (total>0) mi.innerHTML=`${matched} of ${total} states matched` + dupeWarningHTML(cnCounts, stateNames);
     mi.classList.toggle('vis', total>0);
   }
   // Refresh the Group <datalist> so the table's autocomplete offers existing group names.
@@ -3538,10 +3557,20 @@ function applyTheme(mode) {
   root.setProperty('--accent-dark', t.dark);
   root.setProperty('--accent-text-on-accent', t.text);
 }
+// Shared by the viztype-btn click handler and init() — without this, the
+// notice only ever appeared after switching modes at least once, since
+// nothing painted it for the default (Univariate) mode on first load.
+function updateViztypeNotice() {
+  const notice = document.getElementById('viztype-notice');
+  const msg = VIZTYPE_NOTICES[VIZ_MODE];
+  if (msg) { notice.textContent = msg; notice.style.display = ''; }
+  else { notice.style.display = 'none'; }
+}
 
 function init() {
   buildGrids();  // populate color-scheme swatches on startup
   applyTheme(VIZ_MODE);  // paint the default (Univariate) theme before first interaction
+  updateViztypeNotice();  // ditto for the intro notice — otherwise it's blank until a mode switch
 
   // One delegated listener for every "?" help toggle in the panel, rather
   // than wiring each .exp-desc individually — new ones just need the
@@ -3612,10 +3641,7 @@ function init() {
     if (lblV) lblV.textContent = VIZ_MODE==='bivariate' ? 'Value column (X — first variable)' : (VIZ_MODE==='categorical' ? 'Category column' : 'Value column');
     setModeDataPanels(VIZ_MODE);
     setModeStyleControls(VIZ_MODE);
-    const notice = document.getElementById('viztype-notice');
-    const msg = VIZTYPE_NOTICES[VIZ_MODE];
-    if (msg) { notice.textContent = msg; notice.style.display = ''; }
-    else { notice.style.display = 'none'; }
+    updateViztypeNotice();
     // Same convention as every other control: only auto-refresh if a map is
     // already on screen; otherwise the user still has to click Generate first.
     liveRender();

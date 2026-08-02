@@ -180,6 +180,16 @@ footer { text-align: center; padding: 20px; font-size: 11px; color: #8991a3; }
     <h3>State name matching</h3>
     <p>DeshDash recognises full state/UT names (<code>Maharashtra</code>), common 2-letter codes (<code>MH</code>, <code>WB</code>, <code>TN</code>...), and several old/alternate spellings (<code>Orissa</code>&rarr;Odisha, <code>Uttaranchal</code>&rarr;Uttarakhand, etc.). The green/red dot next to each row tells you if that row matched a real state. Whatever you actually type is what shows on the map — e.g. type "Kerala" and it shows "Kerala"; type "Keralam" and it shows "Keralam". Matching still works either way.</p>
 
+    <h3>One row per state — aggregate first</h3>
+    <div class="warn"><b>DeshDash plots data, it doesn't analyze it.</b> It draws exactly the rows you give it — one row per state. If two or more rows resolve to the same state, only the <i>last</i> one is used; the others are silently dropped, not summed or averaged.</div>
+    <p>This trips people up most often when pasting <b>raw/disaggregated data</b> straight from a source file — one row per district, per scheme, per beneficiary, per transaction — instead of a state-level summary:</p>
+    <table>
+      <tr><th>Wrong — raw rows, state repeated</th><th>Right — aggregated first</th></tr>
+      <tr><td><code>Bihar,42</code><br><code>Bihar,58</code><br><code>Bihar,35</code></td><td><code>Bihar,135</code></td></tr>
+    </table>
+    <p>Pasted as-is, the left side keeps only <code>Bihar,35</code> — the map understates Bihar by two-thirds of its real total, with no error message. The fix: total (or average — whichever is meaningful for your metric) every state's rows in Excel/Sheets first, e.g. a pivot table or <code>=SUMIF(state_col, "Bihar", value_col)</code>, so each state appears exactly once before you paste or upload.</p>
+    <div class="tip"><b>Tip:</b> After loading data, check the small text under the State Data table — DeshDash now tells you exactly which states had duplicate rows, if any, so you don't have to spot it by eye.</div>
+
     <h2>Two ideas that apply in every mode</h2>
     <h3>Map labels vs. the hover tooltip</h3>
     <p>What's <b>permanently drawn on the map</b> (state name, values, notes) is controlled separately from what you see on <b>hover</b>. Hovering any state always shows its full detail in a tooltip, no matter how much you've hidden from the permanent map — turn things off in <i>Labels tab &rarr; What to Show</i> to declutter a busy map without ever losing information.</p>
@@ -466,8 +476,8 @@ footer { text-align: center; padding: 20px; font-size: 11px; color: #8991a3; }
       <dt>A state isn't matching (red dot / greyed out on the map)</dt>
       <dd>Check the spelling against the state's actual name, or use a recognized 2-letter code. Old names like "Orissa" and "Uttaranchal" work too, but genuinely unusual spellings or typos won't auto-match — fix the text in the State/UT column.</dd>
 
-      <dt>Two rows show the same state twice</dt>
-      <dd>Two spellings of the same state (e.g. "Kerala" and "Keralam") can both resolve to one state internally — only the last one you entered is kept, the other is silently dropped. Check for accidental duplicate rows if a state's value looks wrong.</dd>
+      <dt>Two rows show the same state twice, or my totals look too low</dt>
+      <dd>Two rows resolving to the same state — whether two spellings (e.g. "Kerala" and "Keralam") or genuine duplicate/raw rows (e.g. district-level data not yet aggregated) — only keep the <i>last</i> one; the rest are silently dropped, not summed. DeshDash now flags this automatically: check the amber warning under the State Data table after loading data. See "One row per state — aggregate first" above for the fix.</dd>
 
       <dt>The map looks too cluttered</dt>
       <dd>Turn off name/value/note display for individual states (see "Two ideas that apply in every mode" under Getting Started), or reduce what's shown by default in the Labels tab — you never lose the data, it's always on hover.</dd>

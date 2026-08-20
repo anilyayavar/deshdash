@@ -3697,7 +3697,12 @@ function init() {
   document.getElementById('btn-fill').addEventListener('click',()=>{
     pushUndoSnapshot();
     document.getElementById('tbody').innerHTML='';
-    geoData.features.forEach(f=>addRow(geoName(f),''));
+    // Fill with the CURRENT official name, not the GeoJSON's superseded one
+    // (Orissa/Uttaranchal/Pondicherry). Typing a state into the table sets
+    // stateNames[cn], which outranks DISPLAY_NAMES in displayName(), so
+    // seeding raw GeoJSON names here would print "Orissa" on the map. canon()
+    // maps the modern name straight back, so matching is unaffected.
+    geoData.features.forEach(f=>{ const n=geoName(f); addRow(DISPLAY_NAMES[n]||n,''); });
   });
   document.getElementById('btn-clr').addEventListener('click',()=>{
     pushUndoSnapshot();

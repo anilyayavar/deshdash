@@ -195,8 +195,13 @@ footer { text-align: center; padding: 20px; font-size: 11px; color: #8991a3; }
     <p>What's <b>permanently drawn on the map</b> (state name, values, notes) is controlled separately from what you see on <b>hover</b>. Hovering any state always shows its full detail in a tooltip, no matter how much you've hidden from the permanent map — turn things off in <i>Labels tab &rarr; What to Show</i> to declutter a busy map without ever losing information.</p>
     <h3>Everything is draggable</h3>
     <p>The legend, every label box, the takeaway box, and every annotation note can be dragged directly on the map to reposition it. You can also hide an individual state's label entirely (Labels tab &rarr; Adjust Label Position &rarr; set that state to "Hidden") if one particular label is in the way — its data is still there on hover.</p>
+    <h3>Every section heading opens and closes</h3>
+    <p>Inside each tab, the grey section headings (<b>Color Scale Type</b>, <b>Scale Range</b>, <b>Legend</b>, <b>Map Takeaway</b> and the rest) are click-to-open toggles, not just dividers. The small <b>&#9656;</b> arrow at the right of each heading shows whether it is open or closed.</p>
+    <p>They all start <b>closed</b> except <b>State Data</b>, so the panel stays short when you first open the app. If a control described in this guide looks like it is missing, click its section heading to open it.</p>
     <h3>Collapsing the control panel</h3>
     <p>The <b>&#9776;</b> button at the top of the screen hides the entire left control column so the map fills the whole window — handy when presenting or screenshotting. Click it again to bring the panel back; it remembers whether it was collapsed the next time you open DeshDash.</p>
+    <h3>The <b>?</b> buttons</h3>
+    <p>Small round <b>?</b> buttons sit beside many controls in the panel. Click one for a short note on what that control does and when to use it. A few of them explain things this guide does not repeat, such as why the categorical color limit stops at 8.</p>
 
     <h2>Saving and exporting</h2>
     <p>The <b>Export</b> tab has two different things — don't mix them up:</p>
@@ -265,7 +270,7 @@ footer { text-align: center; padding: 20px; font-size: 11px; color: #8991a3; }
 
     <h3>Data tab</h3>
     <table class="ctl wide">
-      <tr><td>State Data table</td><td>State/UT + Value columns, with a green/red dot marking whether each row's state matched. <b>+ Row</b> adds a blank row; <b>All States</b> pre-fills all 33 states/UTs so you just type values over a complete list; <b>Clear</b> empties the table; <b>Undo</b> reverts the last change; <b>Reset to Sample</b> reloads the built-in demo dataset.</td></tr>
+      <tr><td>State Data table</td><td>State/UT + Value columns, with a green/red dot marking whether each row's state matched. <b>+ Row</b> adds a blank row; <b>All States</b> pre-fills all 36 states/UTs so you just type values over a complete list; <b>Clear</b> empties the table; <b>Undo</b> reverts the last change; <b>Reset to Sample</b> reloads the built-in demo dataset.</td></tr>
       <tr><td>Paste CSV</td><td>Paste <code>State,Value</code> pairs (comma or tab separated — works pasted straight from Excel), then <b>Parse &amp; Load</b>. Header row auto-detected and skipped. Numbers with grouping commas like <code>1,00,000</code> parse fine.</td></tr>
       <tr><td>Upload CSV</td><td>Upload a .csv/.txt file, then choose the <b>State/UT column</b> and <b>Value column</b> from the dropdowns (auto-detected and pre-selected). If the file has several numeric columns, switch <b>Value column</b> anytime to redraw with a different metric — no re-upload needed.</td></tr>
       <tr><td>Value Format</td><td><b>Prefix</b> (e.g. <code>₹</code>) and <b>Suffix</b> (e.g. <code>Cr</code>, <code>%</code>) text; <b>Decimal places</b> (Auto/0/1/2/3); <b>Thousands separator</b> checkbox. Applies everywhere the value is shown — map label, legend, tooltip.</td></tr>
@@ -279,7 +284,7 @@ footer { text-align: center; padding: 20px; font-size: 11px; color: #8991a3; }
       <tr><td>Custom gradient (Low→High)</td><td>Two color pickers to define your own sequential gradient, used when Custom is selected in the scheme grid.</td></tr>
       <tr><td>Custom diverging (Low→Mid→High)</td><td>Three color pickers for a custom diverging gradient.</td></tr>
       <tr><td>Scale Range — Auto min/max</td><td>On (default): scale sizes itself to your data automatically. Off: set <b>Min</b>/<b>Max</b> manually — useful for comparing several maps on the same scale, or to stop one outlier from stretching the whole range. When off + Diverging, a <b>Midpoint value</b> slider appears.</td></tr>
-      <tr><td>Steps</td><td>Continuous smooth gradient, or a fixed number of discrete color bands (4–8) — discrete bands are often easier to read at a glance in print.</td></tr>
+      <tr><td>Steps</td><td>Continuous smooth gradient, or a fixed number of discrete color bands (4–8, default 5) — discrete bands are often easier to read at a glance in print.</td></tr>
       <tr><td>Other Colors</td><td><b>No-data fill</b> for states with missing values; <b>Border color</b>/<b>width</b> between states; <b>Background/ocean color</b>; <b>Background opacity</b> (SVG export only — PNG export is always solid).</td></tr>
       <tr><td>Legend</td><td><b>Show legend</b> toggle; <b>Position</b> (Center/Left/Right — sets the default drop point); <b>Width</b> as % of map. Draggable on the map regardless of the position setting.</td></tr>
       <tr><td>Map Takeaway</td><td><b>Show takeaway box</b> toggle reveals a text box (supports <code># </code> heading, <code>- </code> bullet, <code>**bold**</code>, <code>*italic*</code>, <code>__underline__</code>), a corner <b>Position</b> + fine <b>dx/dy</b> offset, <b>Text size/color</b>, and <b>Box fill/border color</b>. One map-wide callout, separate from per-state labels — also draggable.</td></tr>
@@ -502,15 +507,16 @@ footer { text-align: center; padding: 20px; font-size: 11px; color: #8991a3; }
       <tr><td>Print / Save as PDF</td><td>Using your browser's own print dialog for a quick PDF.</td></tr>
     </table>
 
-    <h2>What's new in this build</h2>
-    <p>This unified DeshDash combines what used to be two separate tools (DeshDash for choropleths, LabelDash for free-text notes) into one app with four switchable modes, plus two entirely new modes (Bivariate and Categorical) that didn't exist before. Your data, once entered, carries between modes wherever it makes sense — you're not starting over each time you switch.</p>
+    <h2>About this build</h2>
+    <p>DeshDash is one app with four switchable modes for putting India state data on a map. Univariate and Bivariate handle numbers, Categorical handles named groups, and Annotations handles free text. Your data, once entered, carries between modes wherever it makes sense, so you are not starting over each time you switch.</p>
+    <p style="margin-top:10px;font-size:12.5px;color:#6a6f90"><b>Earlier history.</b> This unified build replaces two separate tools, DeshDash for choropleths and LabelDash for free-text notes. Bivariate and Categorical are new modes that neither of them had.</p>
 
     <div class="tip"><b>Tip:</b> Save a project file before experimenting with a setting you're not sure about — it's the fastest way back to where you were.</div>
   </div>
 
 </main>
 
-<footer>DeshDash — part of the Insight Studio suite. This help page covers the unified app's Univariate, Bivariate, Categorical, and Annotations modes.</footer>
+<footer>DeshDash help. Covers the unified app's Univariate, Bivariate, Categorical and Annotations modes.<br>Last updated 19 August 2026.</footer>
 
 <script>
 document.querySelectorAll('.tab-btn').forEach(b => b.addEventListener('click', () => {

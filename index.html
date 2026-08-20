@@ -799,8 +799,8 @@ input[type=checkbox] { accent-color: var(--accent); width: 14px; height: 14px; c
   </div>
   <div id="status">Ready — enter data then click Generate Map</div>
   <div id="app-signature" style="text-align:center;padding:6px 10px;font-size:10px;color:#6a6f90;background:#0f0f1e;border-top:1px solid #2a2a4a">
-    Developed by <strong style="color:#8aabff">Anil Kumar Goyal</strong> &middot; for CDMA<span id="sig-personal" style="display:none"> &middot;
-    <a href="https://www.linkedin.com/in/anil-kumar-goyal/" target="_blank" rel="noopener" style="color:#8aabff;text-decoration:none">LinkedIn</a></span>
+    Developed by <strong style="color:#8aabff">Anil Kumar Goyal</strong> &middot;
+    <a href="https://www.linkedin.com/in/anil-kumar-goyal/" target="_blank" rel="noopener" style="color:#8aabff;text-decoration:none">LinkedIn</a>
     <div style="margin-top:3px;color:#5a6078">Version 1.0 &middot; 20 August 2026</div>
   </div>
 </div>
@@ -4304,14 +4304,6 @@ function init() {
   const dl=document.createElement('datalist'); dl.id='st-list';
   geoData.features.forEach(f=>{ const o=document.createElement('option'); o.value=geoName(f); dl.appendChild(o); });
   document.body.appendChild(dl);
-
-  // The personal link in the signature belongs on the author's own site only.
-  // The copies circulated to field offices, and any departmental intranet copy,
-  // must carry no outbound personal link. Hence host-gated rather than removed.
-  if (/(^|\.)github\.io$/i.test(location.hostname)) {
-    const sp = document.getElementById('sig-personal');
-    if (sp) sp.style.display = '';
-  }
 
   // Pre-fill sample data
   SAMPLE.forEach(([s,v])=>addRow(s,v));

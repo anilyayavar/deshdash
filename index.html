@@ -176,7 +176,7 @@ input[type=checkbox] { accent-color: var(--accent); width: 14px; height: 14px; c
 
 <div id="panel">
   <div id="panel-header" style="position:relative">
-    <h1>DeshDash <span style="font-size:11px;font-weight:700;color:#8aabff;background:#1a1a3a;border:1px solid #3a4a7a;border-radius:10px;padding:2px 8px;vertical-align:middle;letter-spacing:0.3px">v2</span></h1>
+    <h1>DeshDash <span style="font-size:11px;font-weight:700;color:#8aabff;background:#1a1a3a;border:1px solid #3a4a7a;border-radius:10px;padding:2px 8px;vertical-align:middle;letter-spacing:0.3px">v1.0</span></h1>
     <p>Build state-wise choropleth maps of India — labels, legends, and export in one tool</p>
     <a id="btn-help" href="help/index.html" target="_blank" rel="noopener" style="position:absolute;top:14px;right:16px;font-size:11px;font-weight:700;color:#8aabff;text-decoration:none;border:1px solid #3a4a7a;border-radius:12px;padding:4px 11px;background:#1a1a3a">&#10067; Help</a>
   </div>
@@ -799,8 +799,8 @@ input[type=checkbox] { accent-color: var(--accent); width: 14px; height: 14px; c
   </div>
   <div id="status">Ready — enter data then click Generate Map</div>
   <div id="app-signature" style="text-align:center;padding:6px 10px;font-size:10px;color:#6a6f90;background:#0f0f1e;border-top:1px solid #2a2a4a">
-    Developed by <strong style="color:#8aabff">Anil Kumar Goyal</strong> &middot;
-    <a href="https://www.linkedin.com/in/anil-kumar-goyal/" target="_blank" rel="noopener" style="color:#8aabff;text-decoration:none">LinkedIn</a>
+    Developed by <strong style="color:#8aabff">Anil Kumar Goyal</strong><span id="sig-personal" style="display:none"> &middot;
+    <a href="https://www.linkedin.com/in/anil-kumar-goyal/" target="_blank" rel="noopener" style="color:#8aabff;text-decoration:none">LinkedIn</a></span>
     <div style="margin-top:3px;color:#5a6078">Version 1.0 &middot; 20 August 2026</div>
   </div>
 </div>
@@ -4304,6 +4304,14 @@ function init() {
   const dl=document.createElement('datalist'); dl.id='st-list';
   geoData.features.forEach(f=>{ const o=document.createElement('option'); o.value=geoName(f); dl.appendChild(o); });
   document.body.appendChild(dl);
+
+  // The personal link in the signature belongs on the author's own site only.
+  // The copies circulated to field offices, and any departmental intranet copy,
+  // must carry no outbound personal link. Hence host-gated rather than removed.
+  if (/(^|\.)github\.io$/i.test(location.hostname)) {
+    const sp = document.getElementById('sig-personal');
+    if (sp) sp.style.display = '';
+  }
 
   // Pre-fill sample data
   SAMPLE.forEach(([s,v])=>addRow(s,v));
